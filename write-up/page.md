@@ -2,7 +2,7 @@
 
 ## by [Kryl Solutions](https://kryl.com)
 
-![banner image](https://kryl.com/apps/trello/completeness/images/banner.png)
+![banner image](https://kryl.com/apps/trello/trello-complete/images/banner.png)
 
 ## ✅ See Progress. Stay Motivated
 
