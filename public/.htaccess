@@ -1,0 +1,14 @@
+# Using this header, any browser that accesses the site over HTTPS will not
+# be able to access the plain HTTP site for one year (31536000 seconds).
+# One you begin using this, you should not stop using SSL on your site or
+# else your returning visitors will not be able to access your site at all.
+Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
+Header set Content-Security-Policy "script-src 'self' 'unsafe-hashes' p.trellocdn.com;"
+Header set Content-Security-Policy "style-src 'self' 'unsafe-hashes' 'unsafe-inline' p.trellocdn.com;"
+Header set Content-Security-Policy "style-src-elem 'self' 'unsafe-hashes' 'unsafe-inline' p.trellocdn.com;"
+Header set Content-Security-Policy "img-src data: 'self' 'unsafe-hashes' 'unsafe-inline' p.trellocdn.com;"
+Header set Content-Security-Policy "script-src-elem 'self' 'unsafe-hashes' p.trellocdn.com;"
+Header set Content-Security-Policy "default-src https: data: 'unsafe-hashes' 'unsafe-inline';"
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-store, no-cache, must-revalidate"
+</IfModule>
