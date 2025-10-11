@@ -24,8 +24,9 @@ t.render(async () => {
   const viewType = await t.arg("view");
   switch (viewType) {
     case "tour":
+      const show = await t.arg("show");
       const tour = new Tour(document.getElementById("content"));
-      tour.render(r);
+      tour.render(t, show);
       break;
     case "custom":
       const cv = new CustomValuePage();

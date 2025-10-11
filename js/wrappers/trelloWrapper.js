@@ -19,8 +19,8 @@ export default class TrelloWrapper extends BasePage {
    * @returns {Promise<TrelloBoardButtonOption[]>}
    */
   getBoardButton = async(t) => {
-    /** @type {TrelloBoardButtonOption} */
-    const boardButton = {
+    /** @type {TrelloBoardButtonOption[]} */
+    const boardButtons = [{
       text: Common.TITLE,
       condition: "always",
       icon: Common.ICON_DARK,
@@ -54,9 +54,9 @@ export default class TrelloWrapper extends BasePage {
           });
         }
         tt.popup(boardMenuPopup);
-      },
-    };
-    return [boardButton];
+      }
+    }];
+    return boardButtons;
   }
   /**
    * Launches the Tour
@@ -67,7 +67,7 @@ export default class TrelloWrapper extends BasePage {
     /** @type {TrelloPopupIFrameOptions} */
     const popupOpts = {
       args: { view: "tour" },
-      title: Common.TITLE,
+      title: Common.TITLE + " Welcome Tour",
       url: Common.detailsPage,
       height: 265,
     };
@@ -145,7 +145,7 @@ export default class TrelloWrapper extends BasePage {
     /** @type {TrelloModalOptions} */
     const modalDlg = {
       fullscreen: false,
-      height: 400,
+      height: 200,
       url: Common.detailsPage,
       args: { view: "welcome" },
       title: `Thank you for Installing ${Common.APPNAME}`,

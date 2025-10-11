@@ -21,8 +21,9 @@ export default class Tour {
   /**
    * Renders the tour
    * @type {TrelloObject} t
+   * @param {Boolean} [showWelcome]
    */
-  render = async (t) => {
+  render = async (t, showWelcome = false) => {
     const html = /*html*/`
       <div id="headerDiv">
         <img title="icon" width="64px" src="./images/logo.png" style="margin-right: 10px;" /> &nbsp;
@@ -46,7 +47,7 @@ export default class Tour {
       <br />
     `;
     this.#content.innerHTML = html;
-    this.#attachEvents(t);
+    this.#attachEvents(t, showWelcome);
     this.#attachInteractiveElements(t);
     window.setInterval(() => {
       t.sizeTo("#content");
@@ -57,11 +58,15 @@ export default class Tour {
    * Load placeholder pages
    */
   #loadPages = () => {
+    const showTrial = !Common.tbr.isTrialUsed || !Common.tbr.isFeatureAllowed;
     return [
       {
         title: `👋 Welcome to The Completeness Badge`,
         html: /*html*/`<div class="wizardPage">
-          <p>Get your cards to complete! To get the full features, <a href="#" id="startTrialButton">start your 14-day free trial now</a>.</p>
+          <p>
+            <span>Get your cards to complete!</span>
+            <span ${showTrial ? "hidden" : ""}>To get the full features, <a href="#" id="startTrialButton">start your 14-day free trial now</a>.</span>
+          </p>
           <br />
           <ul>
             <li>&nbsp;🎯 To start, open a card, and from the back, enable the badge or set a value.</li>
@@ -132,9 +137,11 @@ export default class Tour {
           <p>If you have any question or suggestions, please contact us:</p>
           <button id="contactButton">Contact Us...</button>
           <hr/>
-          <p>And do not forget you can start a free 14-day no obligation trial...</p>
-          <button id="startTrialButton">Start your Trial!</button>
-          <hr />
+          <div ${showTrial ? "hidden" : ""}>
+            <p>And do not forget you can start a free 14-day no obligation trial...</p>
+            <button id="startTrialButton">Start your Trial!</button>
+            <hr />
+          </div>
           <input type="checkbox" id="hideTourCheckbox">&nbsp;Hide this tour from the menu
         </div>`,
       },
@@ -177,11 +184,31 @@ export default class Tour {
   /**
    * Attach event handlers
    * @param {TrelloObject} t
+   * @param {Boolean} [showWelcome]
    */
-  #attachEvents = (t) => {
+  #attachEvents = (t, showWelcome = false) => {
     const closeBtn = this.#content.querySelector("#closeButton");
     const backBtn = this.#content.querySelector("#backButton");
     const nextBtn = this.#content.querySelector("#nextButton");
+
+    const showWelcomePage = (e) => {
+      /** @type {TrelloModalOptions} */
+      const modalDlg = {
+        fullscreen: false,
+        height: 200,
+        url: Common.detailsPage,
+        args: { view: "welcome" },
+        title: `Thank you for Installing ${Common.APPNAME}`,
+      };
+      t.modal(modalDlg);
+    };
+
+    const saveTourState = async (t) => {
+      const s = new SettingsWrapper();
+      await s.load(t);
+      s.hideTour = this.#hideTour;
+      await s.save(t);
+    }
 
     backBtn.disabled = this.#currentPage === 0;
     if (this.#currentPage > this.#pages.length - 2) {
@@ -190,12 +217,13 @@ export default class Tour {
       nextBtn.innerText = "Next ➡️";
     }
 
-    closeBtn?.addEventListener("click", async () => {
-      const s = new SettingsWrapper();
-      await s.load(t);
-      s.hideTour = this.#hideTour;
-      await s.save(t);
-      t.closeModal();
+    closeBtn?.addEventListener("click", async (e) => {
+      await saveTourState(t);
+      if (showWelcome) {
+        showWelcomePage(e);
+      } else {
+        t.closeModal();
+      }
     });
 
     backBtn?.addEventListener("click", () => {
@@ -204,16 +232,19 @@ export default class Tour {
         backBtn.disabled = true;
       }
       nextBtn.innerText = "Next";
-      this.render(t);
+      this.render(t, showWelcome);
     });
 
-    nextBtn?.addEventListener("click", () => {
+    nextBtn?.addEventListener("click", async (e) => {
       this.#currentPage++;
-      if (this.#currentPage > this.#pages.length - 1) {
-        closeBtn.click();
+      if (this.#currentPage > this.#pages.length - 1 && !showWelcome) {
+        await closeBtn.click();
         return;
+      } else if(this.#currentPage > this.#pages.length - 1 && showWelcome) {
+        await saveTourState(t);
+        showWelcomePage(e);
       }
-      this.render(t);
+      this.render(t, showWelcome);
     });
   };
 
