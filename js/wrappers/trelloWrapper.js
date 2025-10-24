@@ -86,7 +86,7 @@ export default class TrelloWrapper extends BasePage {
     CommonLogger.enabled = s.enableLogging;
     CommonLogger.log(`Loading badge for: ${card.name}`);
     await b.load(t, s);
-    CommonLogger.log(`${card.Name} = ${b.badgeFront.text}`);
+    CommonLogger.log(`${card.name} = ${b.badgeFront.text}`);
     return b.badgeFront;
   }
   /**

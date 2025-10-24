@@ -12,7 +12,7 @@
   "name": "trello-complete",
   "appName": "Completeness Badge",
   "base_build": "1.0.1",
-  "version": "1.0.1.20251024.1",
+  "version": "1.0.1.20251024.2",
   "description": "Get your cards to complete!",
   "main": "server.js",
   "scripts": {

@@ -113,12 +113,9 @@ export default class Common {
   /**
    * INIT REGISTRATION OBJECT
    * 
-   * This is the core call and [initializeRegistrationObject] is exposed in the v1.09+ registration
-   * code that is loaded from https://kryl.com/root.js. This is a redirector that returns either a
-   * _beta_bin (beta) or a __bin (release) object based on the originator. What is required in the
-   * index.html is: 
-   * 
-   * <script crossorigin="anonymous" src="https://kryl.com/root.js"></script>
+   * This is the core call and [initializeRegistrationObject] is exposed in the registration
+   * code that is loaded from https://kryl.com/api/?path=tbr. This api returns either a
+   * (beta) or (release) __bin path based on the originator. 
    * 
    * Additionally, .htaccess needs to include https://localhost:54104 to be able to allow access
    * for beta or debug build.
@@ -126,10 +123,51 @@ export default class Common {
   static initTbr = async () => { 
     if(!Common.tbr) {
       try {
+        let tbrCode = await Common.#loadCode();
+        if (!tbrCode) throw new Error("Could not load registration code.");
+        const tbrScript = document.createElement("script");
+        tbrScript.type = "text/javascript";
+        tbrScript.text = tbrCode;
+        document.head.appendChild(tbrScript);
+        // loaded - now initialize
         Common.tbr = await initializeRegistrationObject(Common.APPNAME, Common.version, Common.isBeta || Common.isDebug, false);
       } catch (e) {
         console.error(e);
       }
     }
-  }
+  };
+  /**
+   * Load out of cache or pull down from the server
+   * @returns {String}
+   */
+  static #loadCode = async () => {
+    let tbrCode = null;
+    const prefix = "tbrCache_";
+    const key = `${prefix}${Common.version}`;
+    const tbrCache = window.localStorage.getItem(key);
+    if (!tbrCache) {
+      Common.isBeta || Common.isDebug && console.log("Fetching registration code from server...");
+      Common.#cleanLocalStoragePrefix(prefix);
+      const tbrJs = await fetch("https://kryl.com/api/?path=tbr", { method: "GET", cache: "no-store" });
+      tbrCode = await tbrJs.text();
+      window.localStorage.setItem(key, window.btoa(tbrCode));
+    } else {
+      Common.isBeta || Common.isDebug && console.log("Using cached registration code...");
+      tbrCode = window.atob(tbrCache);
+    }
+    return tbrCode;
+  };
+  /**
+   * Removes older versions
+   * @param {String} prefix 
+   */
+  static #cleanLocalStoragePrefix = (prefix) => {
+    Common.isBeta || Common.isDebug && console.log("Cleaning older cached registration code...");
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(prefix)) {
+        localStorage.removeItem(key);
+      }
+    }
+  };
 }
