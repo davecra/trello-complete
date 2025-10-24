@@ -50,7 +50,7 @@ export default class WelcomePage extends BasePage {
       const popupOpts = {
         args: { view: "tour", show: true },
         title: Common.TITLE + " Welcome Tour",
-        url: Common.detailsPage,
+        url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
         height: 265,
         mouseEvent: e,
       };
@@ -61,7 +61,7 @@ export default class WelcomePage extends BasePage {
       const popupOpts = {
         args: { view: "settings" },
         title: Common.TITLE,
-        url: Common.detailsPage,
+        url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
         height: 265,
         mouseEvent: e,
       };

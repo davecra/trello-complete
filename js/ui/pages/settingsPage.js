@@ -289,7 +289,7 @@ export default class SettingsPage extends BasePage {
       const opt = document.createElement("option");
       opt.className = "square";
       opt.value = v;
-      opt.innerHTML = "&nbsp;"; 
+      opt.innerHTML = `${`\u25A0`}&nbsp;${v}`; 
       opt.style.backgroundColor = v;
       opt.style.color = v;
       colorSelector.appendChild(opt);
@@ -300,6 +300,7 @@ export default class SettingsPage extends BasePage {
     colorSelector.addEventListener("change", (e) => {
       const val = e.target.value;
       e.target.style["backgroundColor"] = val || "";
+      e.target.style["color"] = val || "";
       document.getElementById("saveButton").removeAttribute('disabled');
       this.#selectedColor = val;
       colorSelectedSpan.style.color = val;

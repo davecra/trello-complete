@@ -5,6 +5,7 @@ const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const fs = require("fs");
 const packageJson = require('./package.json');
+const cacheBust = Date.now();
 async function getHttpsOptions() {
   return { key: fs.readFileSync('./certs/server.key'), cert: fs.readFileSync('./certs/server.cert') };
 }
@@ -49,12 +50,31 @@ module.exports = async (env, options) => {
         filename: "index.html",
         template: "./views/index.html",
         chunks: ["client"],
+        cacheBust
       }),
       new HtmlWebpackPlugin({
         filename: "details.html",
         template: "./views/index.html",
         chunks: ["details"],
+        cacheBust
       }),
+      {
+        apply: (compiler) => {
+          compiler.hooks.compilation.tap("CacheBustPlugin", (compilation) => {
+            HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync(
+              "CacheBustPlugin",
+              (data, cb) => {
+                data.assetTags.scripts.forEach((tag) => {
+                  if (tag.attributes && tag.attributes.src) {
+                    tag.attributes.src += `?cacheBust=${cacheBust}`;
+                  }
+                });
+                cb(null, data);
+              }
+            );
+          });
+        },
+      },
       new ReplaceInFileWebpackPlugin([{
         dir: "dist",
         files: ["version.html"],

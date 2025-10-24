@@ -196,7 +196,7 @@ export default class Tour {
       const modalDlg = {
         fullscreen: false,
         height: 200,
-        url: Common.detailsPage,
+        url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
         args: { view: "welcome" },
         title: `Thank you for Installing ${Common.APPNAME}`,
       };

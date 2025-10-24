@@ -13,6 +13,15 @@ Perfect for creators, managers, and teams who love seeing progress bars fill up 
 
 ---
 
+## 🚀 Get Going Quick
+
+🎯 To start, open a card, and from the back, enable the badge or set a value.
+📊 You can choose a generic 10%–100% value or set a custom one.
+
+![Get Started Image](https://kryl.com/apps/trello/trello-complete/images/1.gif)
+
+---
+
 ## 💡 What You Can Do
 
 Boost motivation and clarity with live progress tracking right on your board:
@@ -80,6 +89,22 @@ Unlock the full experience and supercharge your productivity:
 
 ✨ Start your **14-day free trial** of premium features anytime — no obligation.  
 💌 Have questions or suggestions? [Contact us here](https://kryl.com/?page=contact).  
+
+---
+
+### Subscription Information
+
+Are you considering a subscription or curious about the cost? We have a lot of different subscription options to meet any need you might have, from personal to team to enterprise:
+
+- A single board for just you monthly subscription for $1/mo.
+- A single board for just you annual subscription for $10/yr.
+- All boards for just you monthly subscription for $3/mo.
+- All board for just you annual subscription for $30/yr.
+- A single board all members monthly subscription for $3/mo.
+- A single board all members annual subscription for $30/yr.
+- Or, an enterprise annual subscription $99/yr.
+
+For more information on you can also access it from Power-Up Settings, and the **About** tab, click the **Subscription Information** button to find out more. Or, you can [visit our website here](https://kryl.com/?page=/subscription1).
 
 ---
 
