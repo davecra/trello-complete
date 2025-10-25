@@ -3,17 +3,18 @@
  * DATE: 10/08/2025
  */
 /**
+ * @global
  * @function
  * @name initializeRegistrationObject
  * @param {String} appName
  * @param {String} appVersion
  * @param {Boolean} [isBeta]
  * @param {Boolean} [isOfficeOnly]
- * @returns {TrelloBoardRegistration}
+ * @returns {Promise<TrelloBoardRegistration>}
  * @description Initializes the v1.09+ Registration Module
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function initializeRegistrationObject(appName, appVersion, isBeta = false, isOfficeOnly = false) {}
+async function initializeRegistrationObject(appName, appVersion, isBeta = false, isOfficeOnly = false) {}
 /**
  * @description Wrapper for the Kryl Solution website Product Registration functions - encapsulates everything needed
  * @typedef {Object} TrelloBoardRegistration

@@ -1,3 +1,4 @@
+/// <reference path="../../types/registered.d.js" />
 import DOMPurify from 'dompurify';
 
 /**
@@ -138,7 +139,7 @@ export default class Common {
   };
   /**
    * Load out of cache or pull down from the server
-   * @returns {String}
+   * @returns {Promise<String>}
    */
   static #loadCode = async () => {
     let tbrCode = null;
