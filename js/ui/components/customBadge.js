@@ -249,7 +249,7 @@ export default class CustomBadge {
             args: { view: "custom" },
             height: 1,
             title: "Set custom value",
-            url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+            url: Common.detailsPage,
           }
           tt.popup(opts);
         },
@@ -266,7 +266,7 @@ export default class CustomBadge {
     const popupOpts = {
       args: { view: "settings" },
       title: Common.TITLE,
-      url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+      url: Common.detailsPage,
       height: 265,
     };
     return t.popup(popupOpts);

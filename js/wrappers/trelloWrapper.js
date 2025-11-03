@@ -68,7 +68,7 @@ export default class TrelloWrapper extends BasePage {
     const popupOpts = {
       args: { view: "tour" },
       title: Common.TITLE + " Welcome Tour",
-      url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+      url: Common.detailsPage,
       height: 265,
     };
     return t.modal(popupOpts);    
@@ -131,7 +131,7 @@ export default class TrelloWrapper extends BasePage {
     const modalDlg = {
       fullscreen: false,
       height: 495,
-      url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+      url: Common.detailsPage,
       args: { view: "disabled" },
       title: `Disabling ${Common.APPNAME}`,
     };
@@ -146,7 +146,7 @@ export default class TrelloWrapper extends BasePage {
     const modalDlg = {
       fullscreen: false,
       height: 200,
-      url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+      url: Common.detailsPage,
       args: { view: "welcome" },
       title: `Thank you for Installing ${Common.APPNAME}`,
     };
@@ -160,7 +160,7 @@ export default class TrelloWrapper extends BasePage {
     t.popup({
       args: {view: "stats", stats: "board"},
       title: "Board Completeness Stats",
-      url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+      url: Common.detailsPage,
     });
   };
   /**
@@ -172,7 +172,7 @@ export default class TrelloWrapper extends BasePage {
       fullscreen: false,
       args: {view: "chart"},
       title: "Board Completeness Chart",
-      url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+      url: Common.detailsPage,
     });
   }
   /**
@@ -184,7 +184,7 @@ export default class TrelloWrapper extends BasePage {
     const popupOpts = {
       args: { view: "settings" },
       title: Common.TITLE,
-      url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+      url: Common.detailsPage,
       height: 265,
     };
     return t.popup(popupOpts);

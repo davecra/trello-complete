@@ -12,7 +12,7 @@
   "name": "trello-complete",
   "appName": "Completeness Badge",
   "base_build": "1.0.1",
-  "version": "1.0.1.20251024.2",
+  "version": "1.0.1.20251103.1",
   "description": "Get your cards to complete!",
   "main": "server.js",
   "scripts": {
@@ -44,6 +44,7 @@
     "@babel/core": "^7.26.9",
     "@babel/preset-env": "^7.26.9",
     "babel-loader": "^8.2.3",
+    "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^10.2.4",
     "html-loader": "^3.1.0",
     "html-webpack-plugin": "^5.5.0",

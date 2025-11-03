@@ -98,7 +98,7 @@ export default class ListOptions {
         tt.popup({
           args: {view: "stats", stats: "list"},
           title: "List Completeness Stats",
-          url: Common.detailsPage + `?rnd=${Math.round(Math.random() * 999999999)}`,
+          url: Common.detailsPage,
         });
       }
     },{
