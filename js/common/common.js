@@ -126,10 +126,17 @@ export default class Common {
     if (!!Common.tbr) return true;
     try {
       const tbr_prefix = "tbrCache_";
-      const tbr_key = `${tbr_prefix}${Common.version}`;
+      let tbr_key = `${tbr_prefix}_1.0.0.0`;
       const tbr_beta = Common.isBeta || Common.isDebug;
       /** @type {{ code: string, fetchedAt: number }} */
       let json = null;
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k?.startsWith(tbr_prefix)) {
+          tbr_key = k;
+          break;
+        }
+      }
       if (window.localStorage.getItem(tbr_key)) {
         try {
           tbr_beta && console.log("Attempting to access cached registration code...");
@@ -152,6 +159,7 @@ export default class Common {
         if (!res.ok) throw new Error(`Failed to fetch TBR code: ${res.status}`);
         json = await res.json();
         if (!json?.code) throw new Error("Invalid TBR payload from server");
+        tbr_key = `${tbr_prefix}_${json.version}`;
         localStorage.setItem(tbr_key, window.btoa(JSON.stringify(json)));
       }
       const scriptEl = document.createElement("script");
