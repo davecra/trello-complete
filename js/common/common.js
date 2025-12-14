@@ -122,16 +122,16 @@ export default class Common {
    * for beta or debug build.
    * @returns {Promise<Boolean>}
    */
-  static initTbr = async () => { 
-    if (!!Common.tbr) return true;
+  static initTbr = async () => {
+    if (Common.tbr) return true;
     try {
       const tbr_prefix = "tbrCache_";
       let tbr_key = `${tbr_prefix}_1.0.0.0`;
       const tbr_beta = Common.isBeta || Common.isDebug;
       /** @type {{ code: string, fetchedAt: number }} */
       let json = null;
-      for (let i = localStorage.length - 1; i >= 0; i--) {
-        const k = localStorage.key(i);
+      for (let i = window.localStorage.length - 1; i >= 0; i--) {
+        const k = window.localStorage.key(i);
         if (k?.startsWith(tbr_prefix)) {
           tbr_key = k;
           break;
@@ -140,35 +140,36 @@ export default class Common {
       if (window.localStorage.getItem(tbr_key)) {
         try {
           tbr_beta && console.log("Attempting to access cached registration code...");
-          json = JSON.parse(window.atob(localStorage.getItem(tbr_key)));
-          if (!json || (Date.now() - json.fetchedAt) > 86400000) throw "Expired cache";
-        } catch(e) {
+          json = JSON.parse(window.atob(window.localStorage.getItem(tbr_key)));
+          if (!json || Date.now() - json.fetchedAt > 86400000) throw "Expired cache";
+        } catch (e) {
           console.warn(`Cached TBR cache not loaded: ${e}`);
-          localStorage.removeItem(tbr_key);
+          window.localStorage.removeItem(tbr_key);
           json = null;
         }
       }
       if (!json || !json?.code) {
         tbr_beta && console.log("Clearing local cached versions.");
-        for (let i = localStorage.length - 1; i >= 0; i--) {
-          const k = localStorage.key(i);
-          if (k?.startsWith(tbr_prefix)) localStorage.removeItem(k);
+        for (let i = window.localStorage.length - 1; i >= 0; i--) {
+          const k = window.localStorage.key(i);
+          if (k?.startsWith(tbr_prefix)) window.localStorage.removeItem(k);
         }
         tbr_beta && console.log("Fetching registration code from server...");
-        const res = await fetch(`https://${tbr_beta ? "beta." : ""}kryl.com/api/?path=tbr&version=2`, { cache: "no-store" });
+        const res = await window.fetch(`https://${tbr_beta ? "beta." : ""}kryl.com/api/?path=tbr&version=2`, {
+          cache: "no-store",
+        });
         if (!res.ok) throw new Error(`Failed to fetch TBR code: ${res.status}`);
         json = await res.json();
         if (!json?.code) throw new Error("Invalid TBR payload from server");
         tbr_key = `${tbr_prefix}_${json.version}`;
-        localStorage.setItem(tbr_key, window.btoa(JSON.stringify(json)));
+        window.localStorage.setItem(tbr_key, window.btoa(JSON.stringify(json)));
       }
       const scriptEl = document.createElement("script");
       scriptEl.type = "text/javascript";
       scriptEl.text = window.atob(json.code);
       document.head.appendChild(scriptEl);
-      Common.tbr = await initializeRegistrationObject(
-        Common.APPNAME, Common.version, tbr_beta, false
-      );
+      // eslint-disable-next-line no-undef
+      Common.tbr = await initializeRegistrationObject(Common.APPNAME, Common.VERSION, tbr_beta, false);
       return true;
     } catch (e) {
       console.error(e);
