@@ -109,66 +109,62 @@ export default class Common {
     </ul>
     <p>Get your cards to complete by subscribing today! 🚀🎉</p>
   `;
+  /*********************************************************************
+   * INIT REGISTRATION OBJECT
+   *********************************************************************
   /** @type {TrelloBoardRegistration} */
   static tbr = null;
   /**
-   * INIT REGISTRATION OBJECT
-   * 
    * This is the core call and [initializeRegistrationObject] is exposed in the registration
    * code that is loaded from https://kryl.com/api/?path=tbr. This api returns either a
    * (beta) or (release) __bin path based on the originator. 
-   * 
    * Additionally, .htaccess needs to include https://localhost:54104 to be able to allow access
    * for beta or debug build.
+   * @returns {Promise<Boolean>}
    */
   static initTbr = async () => { 
-    if(!Common.tbr) {
-      try {
-        let tbrCode = await Common.#loadCode();
-        if (!tbrCode) throw new Error("Could not load registration code.");
-        const tbrScript = document.createElement("script");
-        tbrScript.type = "text/javascript";
-        tbrScript.text = tbrCode;
-        document.head.appendChild(tbrScript);
-        // loaded - now initialize
-        Common.tbr = await initializeRegistrationObject(Common.APPNAME, Common.version, Common.isBeta || Common.isDebug, false);
-      } catch (e) {
-        console.error(e);
+    if (!!Common.tbr) return true;
+    try {
+      const tbr_prefix = "tbrCache_";
+      const tbr_key = `${tbr_prefix}${Common.version}`;
+      const tbr_beta = Common.isBeta || Common.isDebug;
+      /** @type {{ code: string, fetchedAt: number }} */
+      let json = null;
+      if (window.localStorage.getItem(tbr_key)) {
+        try {
+          tbr_beta && console.log("Attempting to access cached registration code...");
+          json = JSON.parse(window.atob(localStorage.getItem(tbr_key)));
+          if (!json || (Date.now() - json.fetchedAt) > 86400000) throw "Expired cache";
+        } catch(e) {
+          console.warn(`Cached TBR cache not loaded: ${e}`);
+          localStorage.removeItem(tbr_key);
+          json = null;
+        }
       }
-    }
-  };
-  /**
-   * Load out of cache or pull down from the server
-   * @returns {Promise<String>}
-   */
-  static #loadCode = async () => {
-    let tbrCode = null;
-    const prefix = "tbrCache_";
-    const key = `${prefix}${Common.version}`;
-    const tbrCache = window.localStorage.getItem(key);
-    if (!tbrCache) {
-      Common.isBeta || Common.isDebug && console.log("Fetching registration code from server...");
-      Common.#cleanLocalStoragePrefix(prefix);
-      const tbrJs = await fetch("https://kryl.com/api/?path=tbr", { method: "GET", cache: "no-store" });
-      tbrCode = await tbrJs.text();
-      window.localStorage.setItem(key, window.btoa(tbrCode));
-    } else {
-      Common.isBeta || Common.isDebug && console.log("Using cached registration code...");
-      tbrCode = window.atob(tbrCache);
-    }
-    return tbrCode;
-  };
-  /**
-   * Removes older versions
-   * @param {String} prefix 
-   */
-  static #cleanLocalStoragePrefix = (prefix) => {
-    Common.isBeta || Common.isDebug && console.log("Cleaning older cached registration code...");
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith(prefix)) {
-        localStorage.removeItem(key);
+      if (!json || !json?.code) {
+        tbr_beta && console.log("Clearing local cached versions.");
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const k = localStorage.key(i);
+          if (k?.startsWith(tbr_prefix)) localStorage.removeItem(k);
+        }
+        tbr_beta && console.log("Fetching registration code from server...");
+        const res = await fetch(`https://${tbr_beta ? "beta." : ""}kryl.com/api/?path=tbr&version=2`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`Failed to fetch TBR code: ${res.status}`);
+        json = await res.json();
+        if (!json?.code) throw new Error("Invalid TBR payload from server");
+        localStorage.setItem(tbr_key, window.btoa(JSON.stringify(json)));
       }
+      const scriptEl = document.createElement("script");
+      scriptEl.type = "text/javascript";
+      scriptEl.text = window.atob(json.code);
+      document.head.appendChild(scriptEl);
+      Common.tbr = await initializeRegistrationObject(
+        Common.APPNAME, Common.version, tbr_beta, false
+      );
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
     }
   };
 }
