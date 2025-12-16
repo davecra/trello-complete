@@ -11,6 +11,8 @@ export default class Common {
   /** @type {String} */
   static APPNAME = Common.PACKAGE.appName;
   /** @type {String} */
+  static APIKEY = Common.PACKAGE.apiKey;
+  /** @type {String} */
   static DESCRIPTION = Common.PACKAGE.description;
   /**@type {Boolean} */
   static isDebug = window.location.href.toLowerCase().includes("localhost:");
@@ -24,12 +26,22 @@ export default class Common {
   static detailsPage = `./details.html?rnd=${Math.round(Math.random() * 999999999)}`;
   /** @type {String} */
   static TITLE = `${Common.APPNAME}` //${Common.isBeta ? " (beta)" : Common.isDebug ? " (debug)": ""}`;
+  /** 
+   * Generate a 6 digit hex id
+   * @returns {String} 
+   */
+  static generateId = () => {
+    return Math.floor(Math.random() * 0xFFFFFF)
+      .toString(16)
+      .padStart(6, "0");
+  }
   /**
    * Fixes color with style issues in Trello scheme
    * @param {String} color 
    * @returns {String}
    */
   static trelloColorFix = (color) => {
+    if (color === null) return "";
     return color === "sky" ? "teal" : color === "lime" ? "green" : color === "pink" ? "magenta" : color === "black" ? "gray" : color;
   }
   /**

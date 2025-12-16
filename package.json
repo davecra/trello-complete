@@ -11,8 +11,9 @@
   },
   "name": "trello-complete",
   "appName": "Completeness Badge",
-  "base_build": "1.0.1",
-  "version": "1.0.1.20251214.5",
+  "apiKey": "680adc19745de41d253d5427e637c97c",
+  "base_build": "1.0.2",
+  "version": "1.0.2.20251215.1",
   "description": "Get your cards to complete!",
   "main": "server.js",
   "scripts": {
@@ -26,7 +27,8 @@
     "cors": "^2.8.5",
     "dompurify": "^3.0.6",
     "express": "^4.15.2",
-    "terser-webpack-plugin": "^5.3.9"
+    "terser-webpack-plugin": "^5.3.9",
+    "trello-web": "^1.0.3"
   },
   "engines": {
     "node": ">=16.0.0",

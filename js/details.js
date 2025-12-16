@@ -11,8 +11,13 @@ import Tour from "./ui/pages/tour";
 import WelcomePage from "./ui/pages/welcomePage";
 /** @type {TrelloPowerUp} */
 const tpu = window.TrelloPowerUp;
-/** @type {TrelloObject} */
-const t = tpu.iframe();
+/**
+ * @type {TrelloObject} Trello iframe object
+ */
+var t = tpu.iframe({
+  appKey: Common.APIKEY,
+  appName: Common.APPNAME,
+});
 /**
  * ---------------------------------
  * RENDER -- TRELLO MAIN ENTRY POINT
@@ -29,8 +34,9 @@ t.render(async () => {
       tour.render(t, show);
       break;
     case "custom":
+      const override = await t.arg("override");
       const cv = new CustomValuePage();
-      await cv.render(t);
+      await cv.render(t, override);
       break;
     case "settings":
       const p = new SettingsPage();

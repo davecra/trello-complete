@@ -571,12 +571,12 @@
 /**
 * @callback TrelloListFunction
 * @param {... ("all" | "id" | "name" | "cards")} fields
-* @returns {TrelloList}
+* @returns {Promise<TrelloList>}
 */
 /**
 * @callback TrelloBoardFunction
 * @param {... ("all" | "id" | "name" | "url" | "shortLink" | "members" | "dateLastActivity" | "idOrganization" | "customFields" | "labels" | "memberships")} fields
-* @returns {TrelloBoard}
+* @returns {Promise<TrelloBoard>}
 */
 /**
 * @callback TrelloApiClientObject
@@ -712,11 +712,15 @@
  * @typedef {Object} TrelloCustomCardField
  * @property {String} id
  * @property {String} idCustomField
- * @property {TrelloDateField} value
+ * @property {TrelloDateField | TrelloNumberField} value
  */
 /**
  * @typedef {Object} TrelloDateField
  * @property {Date} date
+ */
+/**
+ * @typedef {Object} TrelloNumberField
+ * @property {Number} number
  */
 /**
 * @typedef {Object} TrelloLabel
@@ -764,8 +768,8 @@
  * @property {String} id
  * @property {String} name
  * @property {Number} pos
- * @property {Boolean} checked
  * @property {Date} due
  * @property {Date} dueReminder
  * @property {String} idMember
+ * @property {"complete" | "incomplete"} state
  */

@@ -1,5 +1,6 @@
 import Common from "../../common/common";
 import SettingsWrapper from "../../common/settingsWrapper";
+import Styles from "../../common/styles";
 
 export default class Tour {
   /** @type {HTMLDivElement} */
@@ -24,6 +25,7 @@ export default class Tour {
    * @param {Boolean} [showWelcome]
    */
   render = async (t, showWelcome = false) => {
+    Styles.applyCss(document.getElementById("content"));
     const html = /*html*/`
       <div id="headerDiv">
         <img title="icon" width="64px" src="./images/logo.png" style="margin-right: 10px;" /> &nbsp;
@@ -69,12 +71,24 @@ export default class Tour {
           </p>
           <br />
           <ul>
-            <li>&nbsp;🎯 To start, open a card, and from the back, enable the badge or set a value.</li>
-            <li>&nbsp;📊 You can choose a generic 10%–100% value or set a custom one.</li>
+            <li>&nbsp;🎯 To start, open a card and, from the back, enable the badge or set a value.</li>
+            <li>&nbsp;✨ Link it to a custom field on your card.</li>
+            <li>&nbsp;📊 Choose a quick preset value (10%–100%).</li>
+            <li>&nbsp;✏️ Enter a custom value.</li>
+            <li>&nbsp;☑️ Or, track completion from a checklist.</li>
           </ul>
           <br />
-          <div style="width:100%; display:flex; justify-content:center;">
-            <img style="border:solid;black;1px;" height="400px" src="./images/1.gif" />
+          <div class="video-container">
+            <iframe
+              width="100%"
+              height="450"
+              original="https://youtu.be/8_-Oifr1ca0"
+              src="https://www.youtube-nocookie.com/embed/8_-Oifr1ca0"
+              title="Setting values"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
           </div>
         </div>`,
       },
@@ -82,12 +96,23 @@ export default class Tour {
         title: `Modify your Settings`,
         html: /*html*/`<div class="wizardPage">
           <ul>
-            <li>&nbsp;🎨 Next, change the badge color and text to fit your needs.</li>
+            <li>&nbsp;🎨 Change the badge color and text to fit your needs.</li>
+            <li>&nbsp;⚡ Conditionally set the badge color based on the value.</li>
+            <li>&nbsp;🏷️ Apply labels based on conditional values.</li>
             <li>&nbsp;🤝 Have a team and want consistency? Switch to team mode.</li>
           </ul>
           <br />
-          <div style="width:100%; display:flex; justify-content:center;">
-            <img style="border:solid;black;1px;" height="400px" src="./images/2.gif" />
+          <div class="video-container">
+            <iframe
+              width="100%"
+              height="450"
+              original="https://youtu.be/2kmxQaHzdZQ"
+              src="https://www.youtube-nocookie.com/embed/2kmxQaHzdZQ"
+              title="Changing settings"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
           </div>
         </div>`,
       },
@@ -99,8 +124,17 @@ export default class Tour {
             <li>⚡ Automatically add badges to cards as soon as they’re created.</li>
           </ul>
           <br />
-          <div style="width:100%; display:flex; justify-content:center;">
-            <img style="border:solid;black;1px;" height="400px" src="./images/3.gif" />
+          <div class="video-container">
+            <iframe
+              width="100%"
+              height="450"
+              original="https://youtu.be/lFoj83e6lJc"
+              src="https://www.youtube-nocookie.com/embed/lFoj83e6lJc"
+              title="Changing settings"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
           </div>
         </div>`,
       },
@@ -108,12 +142,21 @@ export default class Tour {
         title: `Reports and Stats`,
         html: /*html*/`<div class="wizardPage">
           <ul>
-            <li>📊 Get quick stats on your board (and lists).</li>
+            <li>📊 Get quick stats on your board.</li>
             <li>📋 Run a report to see where things stand.</li>
           </ul>
           <br />
-          <div style="width:100%; display:flex; justify-content:center;">
-            <img style="border:solid;black;1px;" width="90%" src="./images/4.gif" />
+          <div class="video-container">
+            <iframe
+              width="100%"
+              height="450"
+              original="https://youtu.be/IqfvbFUOpW4"
+              src="https://www.youtube-nocookie.com/embed/IqfvbFUOpW4"
+              title="Changing settings"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
           </div>
         </div>`,
       },
@@ -123,10 +166,20 @@ export default class Tour {
           <ul>
             <li>🧭 Quickly enable or disable badges for all cards in a list.</li>
             <li>🗂️ Sort your cards by completeness (ascending or descending).</li>
+            <li>📊 Get timely stats on the lists.</li>
           </ul>
           <br />
-          <div style="width:100%; display:flex; justify-content:center;">
-            <img style="border:solid;black;1px;" height="400px" src="./images/5.gif" />
+          <div class="video-container">
+            <iframe
+              width="100%"
+              height="450"
+              original="https://youtu.be/NHBIRZj5VZQ"
+              src="https://www.youtube-nocookie.com/embed/NHBIRZj5VZQ"
+              title="Changing settings"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen>
+            </iframe>
           </div>
         </div>`,
       },

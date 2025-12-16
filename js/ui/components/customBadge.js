@@ -1,3 +1,5 @@
+import TrelloAPIWrapper from "../../api/api.js";
+import TrelloTokenWrapper from "../../api/trelloTokenWrapper.js";
 import Common from "../../common/common";
 import SettingsWrapper, { BadgeMode, BadgeType } from "../../common/settingsWrapper.js";
 
@@ -14,6 +16,10 @@ export default class CustomBadge {
   static _CARD_BADGE_FIRST_RUN_PROP = "fr";
   /** @type {String} */
   static _CARD_BADGE_ENABLED_PROP = "e";
+  /** @type {String} */
+  static _CARD_BADGE_CHECKLIST_PROP = "cid";
+  /** @type {String} */
+  static _CARD_BADGE_OVERRIDE_PROP = "o";
   /** @type {import("../../common/settingsWrapper.js").BadgeData} */
   #badge = {};
   /** @type {import("../../common/settingsWrapper.js").default} */
@@ -22,6 +28,8 @@ export default class CustomBadge {
     enabled: false,
     completeness: 0,
     custom_color: null,
+    checklistId: null,
+    override: false,
   };
   /**
    * Creates a badge from existing settings
@@ -61,14 +69,98 @@ export default class CustomBadge {
     }
   }
   /**
+   * Gets the check lists
+   * @param {TrelloObject} t 
+   * @param {String} cardId
+   */
+  #getChecklists = async (t, cardId) => {
+    const token = await TrelloTokenWrapper.getToken(t, true);
+    const api = new TrelloAPIWrapper();
+    api.init(Common.APIKEY, token);
+    return await api.getCardCheckLists(cardId);
+  }
+  /**
+   * Returns the custom field value
+   * @param {TrelloObject} t 
+   * @returns {Promise<Number>}
+   */
+  #getCustomFieldValue = async (t) => {
+    /** @type {TrelloCustomCardField[]} */
+    const fields = (await t.card("customFieldItems"))?.customFieldItems;
+    if (fields) {
+      const selectedField = fields.find((o) => o.idCustomField === this.#settings.customFieldId);
+      if (selectedField?.value?.number) {
+        const value = selectedField.value.number;
+        return value < 0 ? 0 : value > 100 ? 100 : value;
+      }
+    }
+    return 0;
+  }
+  /**
+   * Returns the checklist completeness
+   * @param {TrelloObject} t 
+   * @returns {Promise<Number>}
+   */
+  #getChecklistValue = async (t) => {
+    /** @type {TrelloCheckList} */
+    const checklist = (await this.#getChecklists(t, (await t.card("id")).id))?.find((o)=>o.id === this.#cardSettings.checklistId);
+    if (checklist) {
+      const totalItems = checklist?.checkItems?.length ?? 0;
+      if (totalItems > 0) {
+        const selectedItems = (checklist?.checkItems?.filter((o) => o.state === "complete"))?.length ?? 0;
+        return (selectedItems / totalItems) * 100;
+      }
+    }
+    return 0;
+  }
+  /**
    * Loads the settings for the card
    * @param {TrelloObject} t 
    */
   #loadBadgeSettings = async (t) => {
     const mode = this.#settings.mode ? this.#settings.mode : BadgeMode.PRIVATE;
     this.#cardSettings.enabled =  await t.get('card', mode, CustomBadge._CARD_BADGE_ENABLED_PROP, false);
-    this.#cardSettings.completeness =  parseInt(await t.get('card', mode, CustomBadge._CARD_BADGE_COMPLETENESS_PROP, 0));
-    this.#cardSettings.custom_color =  await t.get('card', mode, CustomBadge._CARD_BADGE_COLOR_PROP, null);
+    this.#cardSettings.checklistId = await t.get('card', mode, CustomBadge._CARD_BADGE_CHECKLIST_PROP, null);
+    this.#cardSettings.override = await t.get('card', mode, CustomBadge._CARD_BADGE_OVERRIDE_PROP, false);
+    /** @type {Number} */
+    let completeness = parseInt(await t.get('card', mode, CustomBadge._CARD_BADGE_COMPLETENESS_PROP, 0));
+    if (this.#settings.useCustomField && this.#settings.customFieldId && !this.#cardSettings.override) {
+      completeness = await this.#getCustomFieldValue(t);
+    } else if (this.#cardSettings.checklistId) {
+      completeness = await this.#getChecklistValue(t);
+    }
+    this.#cardSettings.completeness = completeness;
+    this.#cardSettings.custom_color = await t.get('card', mode, CustomBadge._CARD_BADGE_COLOR_PROP, null) ?? this.#settings.color;
+    if (this.#settings.useCustomColors && this.#settings.customColors.length > 0 && this.#cardSettings.enabled) {
+      /** @type {import("../../common/settingsWrapper.js").CustomColorAndLabel} */
+      let highestMatch = null;
+      for (const o of this.#settings.customColors) {
+        if (completeness >= o.value) {
+          if (!highestMatch || o.value > highestMatch.value) {
+            highestMatch = o;
+          }
+        }
+      }
+      if (highestMatch) {
+        this.#cardSettings.custom_color = highestMatch.color;
+        if (highestMatch.labelId) {
+          const api = new TrelloAPIWrapper();
+          api.init(Common.APIKEY, await TrelloTokenWrapper.getToken(t, true));
+          const card = await api.getCard((await t.card("id"))?.id ?? null);
+          if (!card.idLabels.find((o) => o === highestMatch.labelId)) {
+            // first remove any of our existing labels
+            if (this.#settings.keepOnlyCurrentLabel) {
+              card.idLabels = card.idLabels.filter((o) => {
+                return !this.#settings.customColors.find((x) => x.labelId === o)
+              });
+            }
+            // add and then update
+            card.idLabels.push(highestMatch.labelId);
+            await api.updateCard((await t.card("id"))?.id ?? null, { idLabels: card.idLabels });
+          }
+        }
+      }
+    } 
   }
   /**
    * Saves the settings for the badge
@@ -79,6 +171,8 @@ export default class CustomBadge {
     await t.set("card", mode, CustomBadge._CARD_BADGE_ENABLED_PROP, this.#cardSettings.enabled);
     await t.set("card", mode, CustomBadge._CARD_BADGE_COMPLETENESS_PROP, this.#cardSettings.completeness);
     await t.set("card", mode, CustomBadge._CARD_BADGE_COLOR_PROP, this.#cardSettings.custom_color);
+    await t.set("card", mode, CustomBadge._CARD_BADGE_CHECKLIST_PROP, this.#cardSettings.checklistId);
+    await t.set("card", mode, CustomBadge._CARD_BADGE_OVERRIDE_PROP, this.#cardSettings.override);
   }
   /**
    * Loads the badge data and sets it up
@@ -99,7 +193,7 @@ export default class CustomBadge {
         if(this.#isThisANewCard(card) === true) {
           if(this.#settings.autoNewCardBadge === true) {
             pos = 40;
-            this.#badge = this.#getBadge(s.type, 0, s.color);
+            this.#badge = this.#getBadge(s.type, 0, this.#cardSettings.custom_color);
             pos = 50;
             this.#cardSettings.enabled = true;
             this.#cardSettings.completeness = 0;
@@ -107,7 +201,7 @@ export default class CustomBadge {
           } 
         } else if (this.#cardSettings.enabled) {
           pos = 90;
-          this.#badge = this.#getBadge(s.type, this.#cardSettings.completeness, s.color);
+          this.#badge = this.#getBadge(s.type, this.#cardSettings.completeness, this.#cardSettings.custom_color);
         }
       }
       pos = 100;
@@ -162,12 +256,44 @@ export default class CustomBadge {
                 tt.closePopup();
               }
             });
+            if (this.#cardSettings.override) {
+              menuItems.push({
+                text: "⚡ Reset override",
+                callback: async (tt) => {
+                  this.#cardSettings.override = false;
+                  await this.#saveBadgeSettings(tt);
+                  tt.closePopup();
+                }
+              });              
+            }
+            const needsOverride = this.#settings.useCustomField && this.#settings.customFieldId;
+            const isOverride = this.#cardSettings.override;
+            /** @type {TrelloCheckList} */
+            let checkList = this.#cardSettings.checklistId && (!needsOverride || isOverride)
+              ? (await t.card("checklists"))?.checklists?.find((o)=>o.id === this.#cardSettings.checklistId)
+              : null;
+            /** @type {TrelloCustomField} */
+            let customField = needsOverride && !isOverride
+              ? (await t.board("customFields"))?.customFields?.find((o)=>o.id === this.#settings.customFieldId)
+              : null;
+            const howSet = checkList 
+              ? ` (✅ ${checkList.name})` 
+              : customField 
+              ? ` (🏷️ ${customField.name})`
+              : this.#cardSettings.override 
+              ? " (⚡ override)" 
+              : "";
+            const whatSet = checkList 
+              ? ` ${await this.#getChecklistValue(t)}%` 
+              : customField 
+              ? ` ${await this.#getCustomFieldValue(t)}%`
+              : ` ${this.#cardSettings.completeness}%`;
             menuItems.push({
-              text: "📦 Set Value",
-              callback: (tt) => {
+              text: `📦 Set ${howSet}${whatSet}`,
+              callback: async (tt) => {
                 /** @type {TrelloPopupListOptions} */
                 const opts = {
-                  items: this.#setValueSubmenu(),
+                  items: await this.#setValueSubmenu(tt),
                   title: "Set Badge Value",
                 }
                 tt.popup(opts);
@@ -220,10 +346,88 @@ export default class CustomBadge {
     }
   }
   /**
-   * Returns the set value submenu
-   * @returns {TrelloItemsAction[]}
+   * Sets to a custom value n
+   * @param {TrelloObject} t
+   * @param {Number} n
+   * @param {Boolean} [override]
    */
-  #setValueSubmenu = () => {
+  #setCustomValue = async (t, n, override = false) => {
+    this.#badge = this.#getBadge(this.#settings.type, n, this.#settings.color);
+    this.#cardSettings.completeness = n;
+    this.#cardSettings.enabled = true;
+    this.#cardSettings.checklistId = null;
+    this.#cardSettings.override = override;
+    await this.#saveBadgeSettings(t);
+    t.closePopup(); 
+  };
+  /**
+   * Prompts the user to override the board setting
+   * @param {TrelloObject} t
+   * @param {"value" | "custom" | "checklist"} type
+   * @param {Number | String} [value]
+   */
+  #promptUserOverride = async (t, type = "value", value = null) => {
+    /** @type {TrelloPopupConfirmOptions} */
+    const opts = {
+      confirmText: "Yes",
+      message: "This card is set to track a custom field set at the board level. Are you sure you want to override that?",
+      onConfirm: (tt) => type === "value" && value 
+        ? this.#setCustomValue(tt, value, true) 
+        : type === "custom" 
+        ? this.#promptCustomValue(tt, true)
+        : type === "checklist" && value
+        ? this.#setChecklist(tt, value, true)
+        : tt.closePopup(), // what?
+      title: "Override Custom Field",
+      type: "confirm",
+      cancelText: "No",
+      confirmStyle: "primary",
+      onCancel: (tt) => tt.closePopup(),
+    }
+    t.popup(opts);
+  };
+  /**
+   * Prompts the user to set a custom value
+   * @param {TrelloObject} t
+   * @param {Boolean} [override]
+   */
+  #promptCustomValue = (t, override = false) => {
+    /** @type {TrelloPopupIFrameOptions} */
+    const opts = {
+      args: { view: "custom", override: override },
+      height: 1,
+      title: "Set custom value",
+      url: Common.detailsPage,
+    }
+    t.popup(opts);
+  }
+  /**
+   * Sets the checklist value
+   * @param {TrelloObject} t
+   * @param {String} id
+   * @param {Boolean} override 
+   */
+  #setChecklist = async (t, id, override = false) => {
+    if (id === this.#cardSettings.checklistId) {
+      this.#cardSettings.checklistId = null;
+      this.#cardSettings.override = false;
+    } else {
+      this.#cardSettings.checklistId = id;
+      this.#cardSettings.override = override;
+    }
+    await this.#saveBadgeSettings(t);
+    t.closePopup();
+  }
+  /**
+   * Returns the set value submenu
+   * @param {TrelloObject} t
+   * @returns {Promise<TrelloItemsAction[]>}
+   */
+  #setValueSubmenu = async (t) => {
+    /** @type {Boolean} */
+    const needsOverride = this.#settings.useCustomField && this.#settings.customFieldId;
+    /** @type {TrelloCheckList[]} */
+    const checkLists = (await t.card("checklists"))?.checklists;
     /** @type {TrelloItemsAction[]} */
     const menuItems = [];
     for (let n = 0; n <= 100; n += 10) {
@@ -231,11 +435,11 @@ export default class CustomBadge {
         {
           text: n + "%",
           callback: async (tt) => {
-            this.#badge = this.#getBadge(this.#settings.type, n, this.#settings.color);
-            this.#cardSettings.completeness = n;
-            this.#cardSettings.enabled = true;
-            await this.#saveBadgeSettings(tt);
-            tt.closePopup(); 
+            if (needsOverride) {
+              this.#promptUserOverride(tt, "value", n);
+            } else {
+              this.#setCustomValue(tt, n);
+            }
           }
         }
       );
@@ -243,17 +447,42 @@ export default class CustomBadge {
     if (Common.tbr.isFeatureAllowed || Common.tbr.hideFeatures === false) {
       menuItems.push({
         text: "🔧 Custom value...",
-        callback: (tt) => {
-          /** @type {TrelloPopupIFrameOptions} */
-          const opts = {
-            args: { view: "custom" },
-            height: 1,
-            title: "Set custom value",
-            url: Common.detailsPage,
+        callback: async (tt) => {
+          if (needsOverride) {
+            this.#promptUserOverride(tt, "custom");
+          } else {
+            this.#promptCustomValue(tt);
           }
-          tt.popup(opts);
-        },
+        }
       });
+      if (checkLists && checkLists.length > 0) {
+        menuItems.push({
+          text: "✅ Track a checklist...",
+          callback: (tt) => {
+            const isOverride = this.#cardSettings.checklistId && this.#cardSettings.override;
+            /** @type {TrelloItemsAction[]} */
+            const checkListSelectItems = checkLists.map((o) => {
+              const checkbox = ((!needsOverride || isOverride)  && o.id === this.#cardSettings.checklistId) ? "☑️" : "⬜"
+              return {
+                text: `${checkbox} ${o?.name} [${o?.checkItems?.length ?? 0}]`,
+                callback: (ttt) => {
+                  if (needsOverride) {
+                    this.#promptUserOverride(ttt, "checklist", o.id);
+                  } else {
+                    this.#setChecklist(ttt, o.id);
+                  }
+                }
+              }
+            });
+            /** @type {TrelloPopupListOptions} */
+            const opts = {
+              items: checkListSelectItems,
+              title: "Select a Checklist",
+            }
+            tt.popup(opts);
+          },
+        });        
+      }
     }
     return menuItems;
   };
@@ -269,7 +498,7 @@ export default class CustomBadge {
       url: Common.detailsPage,
       height: 265,
     };
-    return t.popup(popupOpts);
+    return t.modal(popupOpts);
   }
   /** 
    * Returns the Badge Settings as a JSON string

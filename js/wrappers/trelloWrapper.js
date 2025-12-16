@@ -2,6 +2,7 @@
 /* global TrelloBoardRegistration */
 /// <reference path="../../types/registered.d.js" />
 /// <reference path="../../types/trello.d.js" />
+import TrelloTokenWrapper from "../api/trelloTokenWrapper";
 import Common from "../common/common";
 import { CommonLogger } from "../common/commonLogger";
 import SettingsWrapper from "../common/settingsWrapper";
@@ -19,12 +20,19 @@ export default class TrelloWrapper extends BasePage {
    * @returns {Promise<TrelloBoardButtonOption[]>}
    */
   getBoardButton = async(t) => {
+    if (!(await TrelloTokenWrapper.getToken(t, true))) {
+      await this.onEnable(t);
+    }
     /** @type {TrelloBoardButtonOption[]} */
     const boardButtons = [{
       text: Common.TITLE,
       condition: "always",
       icon: Common.ICON_DARK,
       callback: async (tt) => {
+        if (!(await TrelloTokenWrapper.getToken(tt, true))) {
+          await this.onEnable(t);
+          return;
+        }
         await this._init(t, "getBoardButton", false, false);
         /** @type {TrelloPopupListOptions} */
         const boardMenuPopup = {
@@ -120,7 +128,7 @@ export default class TrelloWrapper extends BasePage {
   getListSorters = async (t) => {
     await this._init(t, "getListSorters");
     const l = new ListOptions();
-    return await l.getSortMenu(t, this._settings);
+    return l.getSortMenu(t, this._settings);
   }
   /**
    * Shows the disable form to the user
@@ -136,6 +144,17 @@ export default class TrelloWrapper extends BasePage {
       title: `Disabling ${Common.APPNAME}`,
     };
     t.modal(modalDlg);
+  }
+  /**
+   * Returns if the user is authenticated
+   */
+  isAuthOk = async (t) => {
+    console.log(1);
+    const trelloToken = await TrelloTokenWrapper.getToken(t, true);
+    console.log(trelloToken);
+    if (!trelloToken) await this.onEnable(t);
+    console.log("here");
+    return trelloToken ? true : false;
   }
   /**
    * Shows the welcome page to the user
@@ -187,6 +206,6 @@ export default class TrelloWrapper extends BasePage {
       url: Common.detailsPage,
       height: 265,
     };
-    return t.popup(popupOpts);
+    return t.modal(popupOpts);
   }
 }

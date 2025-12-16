@@ -200,6 +200,42 @@ export default class Styles {
       #dialog button {
         color: black;
       }
+      .icon-btn {
+        background: none;
+        border: none;
+        padding: 2px;
+        font-size: 14px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .icon-btn:hover {
+        opacity: 0.7;
+      }
+
+      .icon-btn:focus {
+        outline: none;
+      }
+
+      #bodyDiv {
+        padding: 10px;
+      }
+    
+      .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 */
+        height: 0;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+
+      .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
     `;
     // -- NOW APPLY --
     /** @type {HTMLStyleElement} */

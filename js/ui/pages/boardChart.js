@@ -33,6 +33,7 @@ export default class BoardChart extends BasePage {
     Styles.applyCss(document.body);
     /** @type {String} */
     const html = /*html*/ `
+      <img src="./images/chart_banner.png" />
       <div style="padding: 5px;">
         <table>
           <tr>

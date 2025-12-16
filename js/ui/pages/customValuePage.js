@@ -9,9 +9,10 @@ export default class CustomValuePage extends BasePage {
   }
   /**
    * Renders the form
-   * @param {TrelloObject} t 
+   * @param {TrelloObject} t
+   * @param {Boolean} override
    */
-  render = async (t) => {
+  render = async (t, override) => {
     await this._init(t, "CustomValuePage", false, false);
     const card = await t.card("id");
     const value = await t.get(card.id, this._settings.mode, CustomBadge._CARD_BADGE_COMPLETENESS_PROP, 0);
@@ -28,6 +29,8 @@ export default class CustomValuePage extends BasePage {
       const v = document.getElementById("customValueInput").value;
       await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_ENABLED_PROP, true);
       await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_COMPLETENESS_PROP, v);
+      await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_CHECKLIST_PROP, null);
+      if (override) await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_OVERRIDE_PROP, true);
       t.closePopup();
     });
     document.getElementById("cancelButton").addEventListener("click", () => {
