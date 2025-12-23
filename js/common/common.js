@@ -7,7 +7,7 @@ import DOMPurify from 'dompurify';
 export default class Common {
   static PACKAGE = require('../../package.json');
   /** @type {String} */
-  static version = Common.PACKAGE.version;
+  static VERSION = Common.PACKAGE.version;
   /** @type {String} */
   static APPNAME = Common.PACKAGE.appName;
   /** @type {String} */
@@ -137,51 +137,38 @@ export default class Common {
   static initTbr = async () => {
     if (Common.tbr) return true;
     try {
-      const tbr_prefix = "tbrCache_";
-      let tbr_key = `${tbr_prefix}_1.0.0.0`;
-      const tbr_beta = Common.isBeta || Common.isDebug;
-      /** @type {{ code: string, fetchedAt: number }} */
-      let json = null;
-      for (let i = window.localStorage.length - 1; i >= 0; i--) {
-        const k = window.localStorage.key(i);
-        if (k?.startsWith(tbr_prefix)) {
-          tbr_key = k;
-          break;
+      const beta = Common.isBeta || Common.isDebug, prefix = "tbrCache_";
+      let json, tbrKey;
+      // each time we have a new version - check, to make sure we get tbr
+      if (localStorage.getItem(`${Common.APPNAME}_version`) === Common.VERSION) {
+        tbrKey = Object.keys(localStorage).find(k => k.startsWith(prefix));
+        if (tbrKey) {
+          try { json = JSON.parse(atob(localStorage.getItem(tbrKey) || "")); } catch {}
+          if (!json || Date.now() - json.fetchedAt > 864e5) localStorage.removeItem(tbrKey), json = null;
         }
       }
-      if (window.localStorage.getItem(tbr_key)) {
-        try {
-          tbr_beta && console.log("Attempting to access cached registration code...");
-          json = JSON.parse(window.atob(window.localStorage.getItem(tbr_key)));
-          if (!json || Date.now() - json.fetchedAt > 86400000) throw "Expired cache";
-        } catch (e) {
-          console.warn(`Cached TBR cache not loaded: ${e}`);
-          window.localStorage.removeItem(tbr_key);
-          json = null;
-        }
-      }
-      if (!json || !json?.code) {
-        tbr_beta && console.log("Clearing local cached versions.");
-        for (let i = window.localStorage.length - 1; i >= 0; i--) {
-          const k = window.localStorage.key(i);
-          if (k?.startsWith(tbr_prefix)) window.localStorage.removeItem(k);
-        }
-        tbr_beta && console.log("Fetching registration code from server...");
-        const res = await window.fetch(`https://${tbr_beta ? "beta." : ""}kryl.com/api/?path=tbr&version=2`, {
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error(`Failed to fetch TBR code: ${res.status}`);
+      console.info(!json ? `(initTbr) New app version: (${Common.VERSION}).` : `(initTbr) Using cached TBR: (${json.version}).`);
+      // set my version to force checks after this
+      window.localStorage.setItem(`${Common.APPNAME}_version`, Common.VERSION);
+      if (!json) {
+        Object.keys(localStorage).forEach(k => k.startsWith(prefix) && localStorage.removeItem(k));
+        console.info("(initTbr) Fetching TBR from server...");
+        const res = await fetch(`https://${beta ? "beta." : ""}kryl.com/api/?path=tbr&version=2`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`❌ TBR fetch failed: ${res.status}`);
         json = await res.json();
-        if (!json?.code) throw new Error("Invalid TBR payload from server");
-        tbr_key = `${tbr_prefix}_${json.version}`;
-        window.localStorage.setItem(tbr_key, window.btoa(JSON.stringify(json)));
+        if (!json?.code) throw new Error("❌ Invalid TBR payload");
+        localStorage.setItem(tbrKey = `${prefix}_${json.version}`, btoa(JSON.stringify(json)));
       }
-      const scriptEl = document.createElement("script");
-      scriptEl.type = "text/javascript";
-      scriptEl.text = window.atob(json.code);
-      document.head.appendChild(scriptEl);
-      // eslint-disable-next-line no-undef
-      Common.tbr = await initializeRegistrationObject(Common.APPNAME, Common.VERSION, tbr_beta, false);
+      if (!window.__TBR_READY__ && !window.__TBR_LOADING__) {
+        window.__TBR_LOADING__ = true;
+        document.head.appendChild(Object.assign(document.createElement("script"), { type: "text/javascript", text: atob(json.code) }));
+      }
+      for (let i = 0; !window.__TBR_READY__; i++, await new Promise(r => setTimeout(r, 10))) {
+        if (i > 1000) throw new Error("❌ TBR init timeout");
+      }
+      const isOffice = Boolean(typeof Office !== "undefined" && Office.context?.host);
+      Common.tbr = await initializeRegistrationObject(Common.APPNAME, Common.VERSION, beta, isOffice);
+      console.info(Common.tbr ? `(initTbr) TBR loaded, version: (${json.version}).` : `(initTbr) ❌ TBR load failed.`);
       return true;
     } catch (e) {
       console.error(e);

@@ -26,7 +26,7 @@ export default class WelcomePage extends BasePage {
           <p>Once you completed authorization, click Next:</p>
           <button type="button" id="nextButton" disabled>Next ></button>
           <hr />
-          <p>version ${Common.version}</p>
+          <p>version ${Common.VERSION}</p>
         </div>
         <div id="div2" hidden>
           <p>Thank you for authorizing. You can get started by customizing your badge style: <button id="settingsButton">⚙️</button></p>

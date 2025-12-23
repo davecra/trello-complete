@@ -101,7 +101,7 @@ export default class SettingsPage extends BasePage {
       }, 100);
     }
     // add the version number to the settings page
-    document.getElementById("version").innerText = Common.version;
+    document.getElementById("version").innerText = Common.VERSION;
     this.#saveButton = document.getElementById("saveButton");
     this.#saveButton.addEventListener("click", () => this.#save(t));
     const closeButton = document.getElementById("closeButton");
