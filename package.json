@@ -13,7 +13,7 @@
   "appName": "Completeness Badge",
   "apiKey": "680adc19745de41d253d5427e637c97c",
   "base_build": "1.0.2",
-  "version": "1.0.2.20251223.1",
+  "version": "1.0.2.20251223.4",
   "description": "Get your cards to complete!",
   "main": "server.js",
   "scripts": {

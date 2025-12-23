@@ -119,7 +119,7 @@ export default class TrelloWrapper extends BasePage {
   getListActions = async (t) => {
     await this._init(t, "getListActions");
     const l = new ListOptions();
-    return await l.getMenu(t, this._settings);
+    return l.getMenu(t, this._settings);
   }
   /**
    * Returns the list sorter menu

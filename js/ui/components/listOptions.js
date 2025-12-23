@@ -12,9 +12,10 @@ export default class ListOptions {
    * Sorts the list
    * @param {TrelloObject} t
    * @param {SettingsWrapper} s
+   * @returns {Promise<TrelloListActionsOption[]>}
    */
   getSortMenu = (t, s) => {
-    if(Common.tbr.isFeatureAllowed === false && s.hideFeatures === true) return {};
+    if(!Common.tbr?.isFeatureAllowed && s.hideFeatures) return [];
     /** @type {TrelloListActionsOption[]} */
     const listSortActions = [];
     listSortActions.push({
@@ -86,10 +87,10 @@ export default class ListOptions {
    * Returns the menu for the list
    * @param {TrelloObject} t
    * @param {SettingsWrapper} s
-   * @returns {Promise<TrelloListActionsOption>} 
+   * @returns {Promise<TrelloListActionsOption[]>} 
    */
-  getMenu = async (t, s) => {
-    if(Common.tbr.isFeatureAllowed === false && s.hideFeatures === true) return {};
+  getMenu = (t, s) => {
+    if(!Common.tbr?.isFeatureAllowed && s.hideFeatures) return [];
     /** @type {TrelloItemsAction[]} */
     const subMenu = [
     {

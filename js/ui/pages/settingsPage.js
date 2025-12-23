@@ -145,6 +145,7 @@ export default class SettingsPage extends BasePage {
       this.#enableLogging = enableLoggingCheckbox.checked;
       downloadLogButton.hidden = enableLoggingCheckbox.checked ? "" : "hidden";
       this.#saveButton.disabled = false;
+      t.sizeTo("#content");
     })
     downloadLogButton.addEventListener("click", async (e) => {
       CommonLogger.downloadLogFile();
