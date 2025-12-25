@@ -18,7 +18,7 @@ Perfect for creators, managers, and teams who love seeing progress bars fill up 
 🎯 To start, open a card, and from the back, enable the badge or set a value.
 📊 You can choose a generic 10%–100% value or set a custom one.
 
-![Get Started Image](https://kryl.com/apps/trello/trello-complete/images/1.gif)
+[https://youtu.be/mHMcixiDSgI](https://youtu.be/mHMcixiDSgI)
 
 ---
 
@@ -27,7 +27,8 @@ Perfect for creators, managers, and teams who love seeing progress bars fill up 
 Boost motivation and clarity with live progress tracking right on your board:
 
 - 🎯 **Instant Progress Tracking** — Add a completeness badge to any card to see its completion level at a glance.  
-- 📊 **Set Generic or Custom Values** — Choose from 0%–100% or define your own unique progress measure.  
+- 📊 **Set Generic or Custom Values** — Choose from 0%–100% or define your own unique progress measure.
+- 🏷️ **Custom Field Support** — Track completeness with a custom field
 - 🎨 **Customize Look & Feel** — Pick the badge color and text that fit your workflow or visual theme.  
 - 🤝 **Team Consistency Mode** — Keep everyone aligned by sharing the same badge style across your team.  
 
@@ -66,6 +67,7 @@ Get more control with premium automation tools:
 
 Unlock the full experience and supercharge your productivity:
 
+- 🧩 **Custom Fields** — Track completion based on a custom number field 🎯
 - 📊 **Charts** — Visualize your board with stunning visual dashboards ✨  
 - 🔢 **Sort** — Organize your cards by completeness ⬆️⬇️  
 - ✨ **Stats** — Dive into fascinating insights across lists and boards 📊  
