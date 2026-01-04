@@ -109,15 +109,14 @@ export default class Common {
   static featuresListHtml = /*html*/`
     <p>With a subscription you get the following features</p>
     <ul>
-      <li>📊 <b>Charts</b>: Visualize your board like never before ✨</li>
+      <li>📊 <b>Charts</b>: Visualize your board or list like never before ✨</li>
       <li>🔢 <b>Sort</b>: Sort tasks by completeness (ascending ⬆️ or descending ⬇️)</li>
       <li>✨ <b>Stats</b>: Get fascinating insights into your lists and board 📊</li> 
       <li>🌟 <b>Power Boost</b>: Add a badge to all items in a list quickly ⚡️</li>
       <li>🔒 <b>Hidden Gems</b>: Select a list to magically hide the Completeness Badge 🙈</li>
       <li>⚙️ <b>Auto-Magic</b>: Option for new cards to get a badge automatically 🪄</li>
-      <!-- <li>📋 <b>Checklists</b>: Assign completeness based on checklists ✅</li> -->
-      <!-- <li>🔗 <b>Linked Cards</b>: Assign completeness based on linked cards 🧩</li> -->
-      <!-- <li>🎨 <b>Colors and Style</b>: Customize your badge 🖌️</li> -->
+      <li>📋 <b>Checklists</b>: Assign completeness based on checklists ✅</li>
+      <li>🎨 <b>Colors and Labels</b>: Customize badge color, add Trello labels, and filter cards by progress 🖌️</li>
     </ul>
     <p>Get your cards to complete by subscribing today! 🚀🎉</p>
   `;
