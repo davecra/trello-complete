@@ -174,4 +174,4 @@ Kryl Solutions provides a range of Power-ups, Office Add-ins and Browser extensi
 * [Send to Trello](https://appsource.microsoft.com/en-us/product/office/WA200004973?tab=Overview)
 * [Excel Send to Trello](https://appsource.microsoft.com/en-us/product/office/WA200005960?tab=Overview)
 
-![pixel](https://kryl.com/api/?path=pageHit\&appName=completeness)
+![pixel](https://kryl.com/api/?path=pageHit&appName=completeness)
