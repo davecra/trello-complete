@@ -1,0 +1,1 @@
+npx gitleaks-secret-scanner --diff-mode staged
