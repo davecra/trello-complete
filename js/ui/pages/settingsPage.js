@@ -44,6 +44,8 @@ export default class SettingsPage extends BasePage {
   #customColors = [];
   /** @type {Boolean} */
   #keepOnlyCurrentLabel = false;
+  /** @type {BadgeMode} */
+  #mode = BadgeMode.PRIVATE;
   /**
    * Renders the settings form
    * @param {TrelloObject} t 
@@ -128,11 +130,11 @@ export default class SettingsPage extends BasePage {
       }
     });
     document.getElementById("userModeRadioButton").addEventListener("change", () => {
-      this._settings.mode = BadgeMode.PRIVATE;
+      this.#mode = BadgeMode.PRIVATE;
       this.#saveButton.disabled = false;
     });
     document.getElementById("teamModeRadioButton").addEventListener("change", () => {
-      this._settings.mode = BadgeMode.SHARED;
+      this.#mode = BadgeMode.SHARED;
       this.#saveButton.disabled = false;
     });
     /** @type {HTMLInputElement} */
@@ -188,7 +190,8 @@ export default class SettingsPage extends BasePage {
     await this.#setupFieldsSelector(t);
     this.#setupColorSelector("badgeColorSelect", "colorSelectedSpan", this.#selectedColor, (v) => this.#selectedColor = v);
     // now set the mode for the custom settings
-    if (this._settings.mode === BadgeMode.PRIVATE) {
+    this.#mode = this._settings.mode;
+    if (this.#mode === BadgeMode.PRIVATE) {
       document.getElementById("userModeRadioButton").checked = true;
     } else {
       document.getElementById("teamModeRadioButton").checked = true;
@@ -394,7 +397,7 @@ export default class SettingsPage extends BasePage {
         </select>
         <hr />
         <h3>👥 Mode</h3>
-        <input type="radio" name="teamMode" id="userModeRadioButton" checked/>&nbsp;For you only<br/>
+        <input type="radio" name="teamMode" id="userModeRadioButton"/>&nbsp;For you only<br/>
         <input type="radio" name="teamMode" id="teamModeRadioButton"/>&nbsp;Team mode (shared)
       </div>
       <br/>
@@ -555,6 +558,7 @@ export default class SettingsPage extends BasePage {
    * @param {TrelloObject} t
    */
   #save = async (t) => {
+    this._settings.mode = this.#mode;
     this._settings.disabledListId = this.#disabledListId;
     this._settings.autoNewCardBadge = this.#autoNewChecked;
     this._settings.color = this.#selectedColor;

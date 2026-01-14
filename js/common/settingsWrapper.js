@@ -46,7 +46,7 @@ export default class SettingsWrapper {
   /** @type {Boolean} */
   #autoNewCardBadge = false;
   /** @type {BadgeMode} */
-  #mode = BadgeMode.CUSTOM;
+  #mode = BadgeMode.PRIVATE;
   /** @type {String} */
   #color = null;
   /** @type {Boolean} */
@@ -77,7 +77,7 @@ export default class SettingsWrapper {
     let pos = 0;
     try {
       pos = 10;
-      this.#mode = await t.get("board", "shared", SettingsWrapper._BOARD_CUSTOM_MODE, BadgeMode.PRIVATE);
+      this.#mode = await t.get("board", "private", SettingsWrapper._BOARD_CUSTOM_MODE, BadgeMode.PRIVATE);
       pos = 20;
       this.#type = await t.get("board", this.#mode, SettingsWrapper._BOARD_BADGE_TYPE_PROP, BadgeType.BAR);
       pos = 30;
@@ -111,6 +111,7 @@ export default class SettingsWrapper {
   /**
    * Saves the settings
    * @param {TrelloObject} t
+   * @param {BadgeMode} [mode]
    */
   save = async (t) => {
     /** @type {Object} */

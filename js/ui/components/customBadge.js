@@ -352,13 +352,13 @@ export default class CustomBadge {
    * @param {Boolean} [override]
    */
   #setCustomValue = async (t, n, override = false) => {
+    t.closePopup();
     this.#badge = this.#getBadge(this.#settings.type, n, this.#settings.color);
     this.#cardSettings.completeness = n;
     this.#cardSettings.enabled = true;
     this.#cardSettings.checklistId = null;
     this.#cardSettings.override = override;
     await this.#saveBadgeSettings(t);
-    t.closePopup(); 
   };
   /**
    * Prompts the user to override the board setting
@@ -371,8 +371,8 @@ export default class CustomBadge {
     const opts = {
       confirmText: "Yes",
       message: "This card is set to track a custom field set at the board level. Are you sure you want to override that?",
-      onConfirm: (tt) => type === "value" && value 
-        ? this.#setCustomValue(tt, value, true) 
+      onConfirm: async (tt) => type === "value" && value 
+        ? await this.#setCustomValue(tt, value, true) 
         : type === "custom" 
         ? this.#promptCustomValue(tt, true)
         : type === "checklist" && value
@@ -438,7 +438,7 @@ export default class CustomBadge {
             if (needsOverride) {
               this.#promptUserOverride(tt, "value", n);
             } else {
-              this.#setCustomValue(tt, n);
+              await this.#setCustomValue(tt, n);
             }
           }
         }
@@ -447,7 +447,7 @@ export default class CustomBadge {
     if (Common.tbr.isFeatureAllowed || Common.tbr.hideFeatures === false) {
       menuItems.push({
         text: "🔧 Custom value...",
-        callback: async (tt) => {
+        callback: (tt) => {
           if (needsOverride) {
             this.#promptUserOverride(tt, "custom");
           } else {
