@@ -20,7 +20,12 @@ export default class TrelloWrapper extends BasePage {
    * @returns {Promise<TrelloBoardButtonOption[]>}
    */
   getBoardButton = async(t) => {
+    const s = new SettingsWrapper();
+    await s.load(t, true);
+    CommonLogger.enabled = s.enableLogging;
+    CommonLogger.log(`(getBoardButton) Loading Board button.`);
     if (!(await TrelloTokenWrapper.getToken(t, true))) {
+      CommonLogger.log(`(getBoardButton) Need token form user.`);
       await this.onEnable(t);
     }
     /** @type {TrelloBoardButtonOption[]} */
@@ -33,6 +38,7 @@ export default class TrelloWrapper extends BasePage {
           await this.onEnable(t);
           return;
         }
+        CommonLogger.log("(getBoardButton) Loading board button.");
         await this._init(t, "getBoardButton", false, false);
         /** @type {TrelloPopupListOptions} */
         const boardMenuPopup = {
@@ -64,6 +70,7 @@ export default class TrelloWrapper extends BasePage {
         tt.popup(boardMenuPopup);
       }
     }];
+    CommonLogger.log(`(getBoardButton) Completed.`);
     return boardButtons;
   }
   /**
@@ -103,6 +110,8 @@ export default class TrelloWrapper extends BasePage {
    */
   getCardDetailBadge = async (t)=> {
     await this._init(t, "getCardDetails");
+    const card = await t.card("name");
+    CommonLogger.log(`Loading badge back for: ${card.name}`);
     const b = new CustomBadge();
     await b.load(t, this._settings, true);
     return b.badgeBack;
@@ -149,11 +158,8 @@ export default class TrelloWrapper extends BasePage {
    * Returns if the user is authenticated
    */
   isAuthOk = async (t) => {
-    console.log(1);
     const trelloToken = await TrelloTokenWrapper.getToken(t, true);
-    console.log(trelloToken);
     if (!trelloToken) await this.onEnable(t);
-    console.log("here");
     return trelloToken ? true : false;
   }
   /**

@@ -140,17 +140,28 @@ export default class SettingsPage extends BasePage {
     /** @type {HTMLInputElement} */
     const enableLoggingCheckbox = document.getElementById("enableLoggingCheckbox");
     /** @type {HTMLButtonElement} */
+    const clearLogButton = document.getElementById("clearLogButton");
+    clearLogButton.hidden = enableLoggingCheckbox.checked ? "" : "hidden";
+    /** @type {HTMLButtonElement} */
     const downloadLogButton = document.getElementById("downloadLogButton");
     enableLoggingCheckbox.checked = this._settings.enableLogging;
     downloadLogButton.hidden = enableLoggingCheckbox.checked ? "" : "hidden";
     enableLoggingCheckbox.addEventListener("change", () => {
       this.#enableLogging = enableLoggingCheckbox.checked;
       downloadLogButton.hidden = enableLoggingCheckbox.checked ? "" : "hidden";
+      clearLogButton.hidden = enableLoggingCheckbox.checked ? "" : "hidden";
       this.#saveButton.disabled = false;
       t.sizeTo("#content");
-    })
+    });
     downloadLogButton.addEventListener("click", async (e) => {
       CommonLogger.downloadLogFile();
+    });
+    clearLogButton.addEventListener("click", async (e) => {
+      CommonLogger.clear();
+      t.alert({
+        message: "The log has been cleared.",
+        duration: 1,
+      });
     });
     /** @type {HTMLSelectElement} */
     const listSelect = document.getElementById("listSelect");
@@ -358,7 +369,8 @@ export default class SettingsPage extends BasePage {
         <div>
           <input type="checkbox" id="enableLoggingCheckbox"/>&nbsp;Enable logging
           <br />
-          <button id="downloadLogButton" hidden>Download log...</button>
+          <button id="downloadLogButton" hidden>Download log...</button>&nbsp;
+          <button id="clearLogButton" hidden>Clear log</button>
         </div>
         <br/>
         <div id="more"></div>

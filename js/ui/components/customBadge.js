@@ -1,6 +1,7 @@
 import TrelloAPIWrapper from "../../api/api.js";
 import TrelloTokenWrapper from "../../api/trelloTokenWrapper.js";
 import Common from "../../common/common";
+import { CommonLogger } from "../../common/commonLogger.js";
 import SettingsWrapper, { BadgeMode, BadgeType } from "../../common/settingsWrapper.js";
 
 /**
@@ -183,13 +184,17 @@ export default class CustomBadge {
     let pos = 0;
     this.#settings = s;
     try {
+      CommonLogger.log(`(load) Loading badge settings...`);
       await this.#loadBadgeSettings(t);
       /** @type {TrelloCard} */
       const card = await t.card("idList", "id");
       pos = 10;
       this.#badge = { text: null, color: null };
+      // if we are not in a disabled list
       if(this.#settings.disabledListId !== card.idList) {
+        CommonLogger.log(`(load) Card is not in disabled list: ${card.idList}`);
         pos = 30;
+        // is this a new card?
         if(this.#isThisANewCard(card) === true) {
           if(this.#settings.autoNewCardBadge === true) {
             pos = 40;
@@ -197,21 +202,25 @@ export default class CustomBadge {
             pos = 50;
             this.#cardSettings.enabled = true;
             this.#cardSettings.completeness = 0;
+            CommonLogger.log("(load) New card detected.");
             await this.#saveBadgeSettings(t);
           } 
         } else if (this.#cardSettings.enabled) {
           pos = 90;
+          CommonLogger.log(`(load) Get badge for ${card.id}.`);
           this.#badge = this.#getBadge(s.type, this.#cardSettings.completeness, this.#cardSettings.custom_color);
         }
+      } else {
+        CommonLogger.log(`(load) Card is on a disabled list: ${card.idList}`);
       }
       pos = 100;
-      if(!this.#badge) {
-        console.error("Unexpected failure. The badge was not set.");
-        return;
-      }
+      if(!this.#badge) throw "Unexpected failure. The badge was not set.";
+      CommonLogger.log(`(load) Completed: ${JSON.stringify(this.#badge)}`); // do this before icon (log pollution)
       this.#badge.icon = Common.ICON_DARK;
     } catch (e) {
-      console.error(`(load) Failed at: ${pos}.\n${e}`);
+      const $msg = `(load) Failed at: ${pos}.\n${e}`;
+      console.error($msg);
+      CommonLogger.log($msg);
     }
   }
   /**
