@@ -1,10 +1,22 @@
 /// <reference path="../../types/registered.d.js" />
 import DOMPurify from 'dompurify';
-
 /**
  * Common Static Class
  */
 export default class Common {
+  ///////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////SUBSCRIPTION REGISTRATION///////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////
+  /**
+  * READ-ONLY: TBR Subscription Registration Module
+  * @type {TrelloBoardRegistration | null}
+  */
+  static get tbr() {
+    return window.FROM_TBR_SCRIPT_TAG?.tbr ?? null;
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////SUBSCRIPTION REGISTRATION///////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////
   static PACKAGE = require('../../package.json');
   /** @type {String} */
   static VERSION = Common.PACKAGE.version;
@@ -120,58 +132,4 @@ export default class Common {
     </ul>
     <p>Get your cards to complete by subscribing today! 🚀🎉</p>
   `;
-  /*********************************************************************
-   * INIT REGISTRATION OBJECT
-   *********************************************************************
-  /** @type {TrelloBoardRegistration} */
-  static tbr = null;
-  /**
-   * This is the core call and [initializeRegistrationObject] is exposed in the registration
-   * code that is loaded from https://kryl.com/api/?path=tbr. This api returns either a
-   * (beta) or (release) __bin path based on the originator. 
-   * Additionally, .htaccess needs to include https://localhost:54104 to be able to allow access
-   * for beta or debug build.
-   * @returns {Promise<Boolean>}
-   */
-  static initTbr = async () => {
-    if (Common.tbr) return true;
-    try {
-      const beta = Common.isBeta || Common.isDebug, prefix = "tbrCache_";
-      let json, tbrKey;
-      // each time we have a new version - check, to make sure we get tbr
-      if (localStorage.getItem(`${Common.APPNAME}_version`) === Common.VERSION) {
-        tbrKey = Object.keys(localStorage).find(k => k.startsWith(prefix));
-        if (tbrKey) {
-          try { json = JSON.parse(atob(localStorage.getItem(tbrKey) || "")); } catch {}
-          if (!json || Date.now() - json.fetchedAt > 864e5) localStorage.removeItem(tbrKey), json = null;
-        }
-      }
-      console.info(!json ? `(initTbr) New app version: (${Common.VERSION}).` : `(initTbr) Using cached TBR: (${json.version}).`);
-      // set my version to force checks after this
-      window.localStorage.setItem(`${Common.APPNAME}_version`, Common.VERSION);
-      if (!json) {
-        Object.keys(localStorage).forEach(k => k.startsWith(prefix) && localStorage.removeItem(k));
-        console.info("(initTbr) Fetching TBR from server...");
-        const res = await fetch(`https://${beta ? "beta." : ""}kryl.com/api/?path=tbr&version=2`, { cache: "no-store" });
-        if (!res.ok) throw new Error(`❌ TBR fetch failed: ${res.status}`);
-        json = await res.json();
-        if (!json?.code) throw new Error("❌ Invalid TBR payload");
-        localStorage.setItem(tbrKey = `${prefix}_${json.version}`, btoa(JSON.stringify(json)));
-      }
-      if (!window.__TBR_READY__ && !window.__TBR_LOADING__) {
-        window.__TBR_LOADING__ = true;
-        document.head.appendChild(Object.assign(document.createElement("script"), { type: "text/javascript", text: atob(json.code) }));
-      }
-      for (let i = 0; !window.__TBR_READY__; i++, await new Promise(r => setTimeout(r, 10))) {
-        if (i > 1000) throw new Error("❌ TBR init timeout");
-      }
-      const isOffice = Boolean(typeof Office !== "undefined" && Office.context?.host);
-      Common.tbr = await initializeRegistrationObject(Common.APPNAME, Common.VERSION, beta, isOffice);
-      console.info(Common.tbr ? `(initTbr) TBR loaded, version: (${json.version}).` : `(initTbr) ❌ TBR load failed.`);
-      return true;
-    } catch (e) {
-      console.error(e);
-      return false;
-    }
-  };
 }

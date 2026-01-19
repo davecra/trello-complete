@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ReplaceInFileWebpackPlugin = require('replace-in-file-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const fs = require("fs");
@@ -136,7 +135,6 @@ module.exports = async (env, options) => {
           },
         ],
       }),
-
       // Version info page
       new HtmlWebpackPlugin({
         filename: isProduction ? "../version.html" : "version.html",
@@ -147,14 +145,14 @@ module.exports = async (env, options) => {
           APPNAME: packageJson.appName,
         },
       }),
-
       new HtmlWebpackPlugin({
         filename: isProduction ? "../index.html" : "index.html",
         template: "./views/index.html",
         chunks: [],
         inject: false,
         templateParameters: {
-          BUST: Date.now(), // 👈 adds a cache-busting timestamp
+          VERSION: packageJson.version, //<-- verify this exists
+          IS_DEV: !isProduction,
         },
       }),
       new HtmlWebpackPlugin({
@@ -163,10 +161,10 @@ module.exports = async (env, options) => {
         chunks: [],
         inject: false,
         templateParameters: {
-          BUST: Date.now(), // 👈 adds a cache-busting timestamp
+          VERSION: packageJson.version, //<-- verify this exists
+          IS_DEV: !isProduction,
         },
       }),
-
       isProduction && new CacheBustPlugin(),
       isProduction && new StableEntryPlugin(),
     ],

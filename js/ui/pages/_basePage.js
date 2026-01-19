@@ -97,6 +97,9 @@ export default class BasePage {
       const member = await t.member("id");
       // wait here until init is completed
       await new Promise(async (resolve) => await Common.tbr.init({
+        appName: Common.APPNAME,
+        appVersion: Common.VERSION,
+        isBeta: Common.isBeta,
         eventHooks: {
           "errorEvent": async () => {
             console.error("Subscription validation failed.");

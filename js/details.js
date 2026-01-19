@@ -24,7 +24,6 @@ var t = tpu.iframe({
  * ---------------------------------
  */
 t.render(async () => {
-  await Common.initTbr();
   /** @type {"settings" | "stats" | "disabled" | "chart" | "custom" | "tour"} */
   const viewType = await t.arg("view");
   switch (viewType) {
@@ -57,9 +56,11 @@ t.render(async () => {
       w.render(t);
       break;
     case "disabled":
-      if (!Common.tbr) {
-        await Common.initTbr();
+      try {
         await Common.tbr.init({
+          appName: Common.APPNAME,
+          appVersion: Common.VERSION,
+          isBeta: Common.isBeta,
           boardData: {
             boardName: "UNKNOWN",
             idBoard: "UNKNOWN",
@@ -68,8 +69,8 @@ t.render(async () => {
             idOrg: "UNKNOWN",
           },
         });
-      }
-      await Common.tbr.showDisabledForm(t);
+        await Common.tbr.showDisabledForm(t);
+      } catch { }
       break;
   }
 });

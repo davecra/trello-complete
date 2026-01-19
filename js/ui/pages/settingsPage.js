@@ -89,7 +89,6 @@ export default class SettingsPage extends BasePage {
       t.sizeTo("#content");
     });
     this.#tabs.render();
-    //this.#checkRegistration(t); // do this here to avoid race condition on content html insertion
     Styles.applyCss(content);
     await this._insertSubscriptionSection(t);
     await this._insertRating(t);
@@ -308,7 +307,9 @@ export default class SettingsPage extends BasePage {
     });
     this.#hidePremiumFeatureSettings();
     // finally
-    t.sizeTo("#content");
+    window.setTimeout(() => {
+      t.sizeTo("#content");
+    }, 100);
   };
   /**
    * Puts all available Number fields in the fields selector list

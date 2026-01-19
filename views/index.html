@@ -8,7 +8,9 @@
     <title>TRELLO-COMPLETE</title>
     <link crossorigin="anonymous" rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
     <script crossorigin="anonymous" src="https://p.trellocdn.com/power-up.min.js"></script>
-    <script defer src="./client.js?cacheBust=<%= BUST %>"></script>
+    <!-- Kryl Solutions - TBR - Subscription Module -->
+    <script src="https://<%= IS_DEV ? 'beta.' : '' %>kryl.com/__bin/tbr/3.1/tbr.init.js?v=<%= IS_DEV ? Date.now() : VERSION %>"></script>
+    <script defer src="./client.js?cacheBust=<%= VERSION %>"></script>
   </head>
   <body>
     <div id="content"></div>

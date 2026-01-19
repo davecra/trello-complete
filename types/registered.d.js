@@ -1,30 +1,19 @@
 /**
- * VERSION: 1.0.20.20251008
- * DATE: 10/08/2025
+ * VERSION: 3.1
+ * DATE: 01/19/2026
  */
-/**
- * @global
- * @function
- * @name initializeRegistrationObject
- * @param {String} appName
- * @param {String} appVersion
- * @param {Boolean} [isBeta]
- * @param {Boolean} [isOfficeOnly]
- * @returns {Promise<TrelloBoardRegistration>}
- * @description Initializes the v1.09+ Registration Module
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function initializeRegistrationObject(appName, appVersion, isBeta = false, isOfficeOnly = false) {}
 /**
  * @description Wrapper for the Kryl Solution website Product Registration functions - encapsulates everything needed
  * @typedef {Object} TrelloBoardRegistration
  * @property {InitFunction}                         init
+ * @property {ReInitFunction}                       reinitialize
  * @property {SetupSubscriptionSettingsFunction}    renderSubscriptionStatusSection
  * @property {LockFeatureAndNagFunction}            checkFeatureWithNotification
  * @property {CheckRegistrationFunction}            checkRegistrationWithNotification
  * @property {GetOfficeDialogInfoFunction}          getOfficeDialogInfo
  * @property {Boolean}                              isSubscriptionNeeded
  * @property {Boolean}                              isFeatureAllowed
+ * @property {Boolean}                              isBasicTierAllowed
  * @property {Number}                               maxUserCount
  * @property {TrelloItemsAction}                    nagMenu - ARCHIVED - DO NOT USE
  * @property {TrelloItemsAction}                    trialMenu - ARCHIVED - DO NOT USE
@@ -41,11 +30,35 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
  * @property {TrelloItemsAction}                    trialConfirmationMenu
  * @property {TrelloItemsAction}                    nagConfirmationMenu
  * @property {TrialConfirmPopupFunction}            trialConfirmPopup
+ * @property {OnTrialConfirmPopupFunction}          onTrialConfirmPopup - this is with an async promise (returns true if started)
  * @property {NagConfirmPopupFunction}              nagConfirmPopup
  * @property {ShowWelcomeFunction}                  showWelcome
  * @property {Boolean}                              isBusy
  * @property {String}                               instanceId
+ * @property {Boolean}                              isInitialized
+ * @property {ClearRegistrationCacheFunction}       clearRegistrationCache
+ * @property {ReportErrorHandler}                   reportError
+ * @property {SQIDHandler}                          sqid
+ * @property {Boolean}                              sqidOpt
+ * @property {String}                               memberId READ-ONLY: The email address of the Office user or Trello member Id
+ * @property {String}                               boardId READ-ONLY: The Trello board ID
+ * @property {String}                               orgId READ-ONLY: The Trello organizational ID
+ * @property {Boolean}                              isUserOnTrial
+ * @property {String}                               version
  * @constructor
+ */
+/**
+ * @callback SQIDHandler
+ * @param {String} id
+ * @param {Number} [amount]
+ */
+/**
+ * @callback ReportErrorHandler
+ * @param {ErrorObject} errorObject
+ * @returns {String} correlationId
+ */
+/**
+ * @callback ClearRegistrationCacheFunction
  */
 /**
  * @callback ShowWelcomeFunction
@@ -54,13 +67,19 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
  */
 /**
  * @callback NagConfirmPopupFunction
- * @param {TrelloObject} t 
+ * @param {TrelloObject} t
  * @param {MouseEvent} [e]
  * @param {Boolean} [featureOnly] false is default
  */
 /**
+ * @callback OnTrialConfirmPopupFunction
+ * @param {TrelloObject} t
+ * @param {MouseEvent} [e]
+ * @returns {Promise<Boolean>}
+ */
+/**
  * @callback TrialConfirmPopupFunction
- * @param {TrelloObject} t 
+ * @param {TrelloObject} t
  * @param {MouseEvent} [e]
  */
 /**
@@ -114,7 +133,12 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
 /**
  * @callback GetOfficeDialogInfoFunction
  * @param {String} orgName only for Send to Trello
+ * @param {TbrTabType} tab
  * @returns {RegistrationSubmission}
+ */
+/**
+ * @typedef {("main" | "trial" | "pricing" | "register")} TbrTabType
+ * A type representing possible page types in the application.
  */
 /**
  * @callback ShowTrelloDialogFunction
@@ -123,6 +147,11 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
 /**
  * @callback InitFunction
  * @param {TrelloBoardInitData | OfficeInitData} cdata
+ * @returns {Promise<void>}
+ */
+/**
+ * @callback ReInitFunction
+ * @returns {Promise<void>}
  */
 /**
  * @typedef {Object} BoardInitData
@@ -134,6 +163,7 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
  */
 /**
  * @typedef {Object} TrelloBoardRegistrationEventHooks
+ * @property {EventCallbackHandler} showDialog
  * @property {EventCallbackHandler} errorEvent
  * @property {EventCallbackHandler} completedEvent
  * @property {EventCallbackHandler} statusEvent
@@ -144,6 +174,9 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
  * @property {BoardInitData} boardData
  * @property {String} featuresListHtml
  * @property {TrelloBoardRegistrationEventHooks} eventHooks
+ * @property {String} appName
+ * @property {String} appVersion
+ * @property {Boolean} isBeta
  */
 /**
  * @typedef {Object} OfficeInitData
@@ -151,6 +184,9 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
  * @property {String} appName
  * @property {String} featuresListHtml
  * @property {TrelloBoardRegistrationEventHooks} eventHooks
+ * @property {String} appName
+ * @property {String} appVersion
+ * @property {Boolean} isBeta
  */
 /**
  * @callback RegistrationResultOnlyFunction
@@ -218,10 +254,19 @@ async function initializeRegistrationObject(appName, appVersion, isBeta = false,
  * @property {String} board The Board Name
  * @property {SiteLink} link link
  * @property {Boolean} dark for office only - determines dark mode is set
+ * @property {TbrTabType} tab
  */
 /**
  * @typedef {Object} SiteLink
  * @property {String} board the board Id
  * @property {String} member the member Id
  * @property {String} app  the app name
+ */
+/**
+ * @typedef {Object} ErrorObject
+ * @property {String} errorFunction
+ * @property {Number} errorPos
+ * @property {String} errorCode
+ * @property {String} errorMessage
+ * @property {String} errorStack
  */

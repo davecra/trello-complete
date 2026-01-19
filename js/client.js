@@ -8,7 +8,6 @@ import TrelloWrapper from './wrappers/trelloWrapper';
  * ----------------------------------
  */
 (async ()=> {
-  await Common.initTbr();
   const w = new TrelloWrapper();
   const tpu = window.TrelloPowerUp;
   tpu.initialize({
