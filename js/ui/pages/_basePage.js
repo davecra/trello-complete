@@ -99,7 +99,7 @@ export default class BasePage {
       await new Promise(async (resolve) => await Common.tbr.init({
         appName: Common.APPNAME,
         appVersion: Common.VERSION,
-        isBeta: Common.isBeta,
+        isBeta: Common.isBeta || Common.isDebug,
         eventHooks: {
           "errorEvent": async () => {
             console.error("Subscription validation failed.");
