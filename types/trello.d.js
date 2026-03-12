@@ -595,7 +595,7 @@
 */
 /**
 * @callback TrelloIsAuthorizedFunction
-* @returns {Boolean} true if the user is authorized
+* @returns {Promise<Boolean>} true if the user is authorized
 */
 /**
 * @callback TrelloAuthorizeFunction
