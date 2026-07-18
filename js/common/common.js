@@ -9,11 +9,26 @@ export default class Common {
   ///////////////////////////////////////////////////////////////////////////////////////
   /**
   * READ-ONLY: TBR Subscription Registration Module
-  * @type {TrelloBoardRegistration | null}
+  * @type {TrelloBoardRegistration}
   */
   static get tbr() {
     return window.FROM_TBR_SCRIPT_TAG?.tbr ?? null;
   }
+  /**
+   * Initializes the TBR on the boot strapper object with the provided data
+   * @param {OfficeInitData} cdata
+   */
+  static initTbr = async (cdata) => {
+    const start = Date.now();
+    const timeout = 10000;
+    while (!window.FROM_TBR_SCRIPT_TAG?.__tbr?.init) {
+      if (Date.now() - start > timeout) {
+        throw new Error("(initTbr) TBR bootstrap not available");
+      }
+      await new Promise((r) => window.setTimeout(r, 10));
+    }
+    await window.FROM_TBR_SCRIPT_TAG.__tbr.init(cdata);
+  };
   ///////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////SUBSCRIPTION REGISTRATION///////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////

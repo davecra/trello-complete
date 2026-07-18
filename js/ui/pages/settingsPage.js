@@ -2,11 +2,13 @@
 /* global TrelloBoardRegistration */
 /// <reference path="../../../types/registered.d.js" />
 /// <reference path="../../../types/trello.d.js" />
+import TrelloFrame from "../../common/trelloFrame";
 import Common from "../../common/common";
 import { CommonLogger } from "../../common/commonLogger";
 import SettingsWrapper, { BadgeMode, BadgeType } from "../../common/settingsWrapper";
 import Styles from "../../common/styles";
 import ColorAndLabelDialog from "../components/colorAndLabelDialog";
+import PromptBox from "../components/promptBox";
 import TabSheet from "../components/tabSheet";
 import BasePage from "./_basePage";
 /**
@@ -29,7 +31,7 @@ export default class SettingsPage extends BasePage {
   /** @type {Boolean} */
   #enableLogging = false;
   /** @type {Boolean} */
-  #hideFeatures = Common.tbr.hideFeatures;
+  #hideFeatures = false;
   /** @type {Boolean} */
   #hideTour = false;
   /** @type {TabSheet} */
@@ -52,6 +54,7 @@ export default class SettingsPage extends BasePage {
    */
   render = async (t) => {
     await this._init(t, "settingsPage");
+    this.#hideFeatures = Common.tbr.hideFeatures;
     Styles.applyCss(document.getElementById("content"));
     /** @type {HTMLDivElement} */
     const content = document.getElementById("content");
@@ -108,22 +111,14 @@ export default class SettingsPage extends BasePage {
     const closeButton = document.getElementById("closeButton");
     closeButton.addEventListener("click", (e) => {
       if (!this.#saveButton.disabled) {
-        /** @type {TrelloPopupConfirmOptions} */
-        const opts = {
-          confirmText: "Yes",
-          message: "There are unsaved changes. Are you sure you want to close the settings page?",
-          onConfirm: (tt) => {
-            tt.closePopup();
-            tt.closeModal();
-          },
-          title: "Unsaved Changes",
-          type: "confirm",
-          cancelText: "No",
-          confirmStyle: "danger",
-          mouseEvent: e,
-          onCancel: (tt) => tt.closePopup(),
-        }
-        t.popup(opts);
+        e.preventDefault();
+        const prompt = new PromptBox(
+          content,
+          "Close Settings",
+          "Are you sure you want to close? You have unsaved changes."
+        );
+        prompt.addEventHandler("onConfirm", () => t.closeModal());
+        prompt.render();
       } else {
         t.closeModal();
       }
@@ -265,7 +260,7 @@ export default class SettingsPage extends BasePage {
         mouseEvent: e,
         onCancel: (tt) => tt.closePopup(),
       };
-      t.popup(opts);
+      TrelloFrame.openPopup(t, opts);
     });
     // Custom single color
     this.#useCustomColors = this._settings.useCustomColors;
@@ -499,7 +494,7 @@ export default class SettingsPage extends BasePage {
           mouseEvent: e,
           onCancel: (tt) => tt.closePopup(),
         };
-        t.popup(opts);
+        TrelloFrame.openPopup(t, opts);
       });
     }
   }

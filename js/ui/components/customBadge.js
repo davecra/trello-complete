@@ -1,3 +1,4 @@
+import TrelloFrame from "../../common/trelloFrame";
 import TrelloAPIWrapper from "../../api/api.js";
 import TrelloTokenWrapper from "../../api/trelloTokenWrapper.js";
 import Common from "../../common/common";
@@ -305,7 +306,7 @@ export default class CustomBadge {
                   items: await this.#setValueSubmenu(tt),
                   title: "Set Badge Value",
                 }
-                tt.popup(opts);
+                TrelloFrame.openPopup(tt, opts);
               }
             });
             menuItems.push({
@@ -330,7 +331,7 @@ export default class CustomBadge {
             title: Common.TITLE, 
             items: menuItems
           }
-          return t.popup(popupOpts);
+          return TrelloFrame.openPopup(t, popupOpts);
         }
       }
       /** @type {TrelloDetailBadgeOption[]} */
@@ -393,7 +394,7 @@ export default class CustomBadge {
       confirmStyle: "primary",
       onCancel: (tt) => tt.closePopup(),
     }
-    t.popup(opts);
+    TrelloFrame.openPopup(t, opts);
   };
   /**
    * Prompts the user to set a custom value
@@ -408,7 +409,7 @@ export default class CustomBadge {
       title: "Set custom value",
       url: Common.detailsPage,
     }
-    t.popup(opts);
+    TrelloFrame.openPopup(t, opts);
   }
   /**
    * Sets the checklist value
@@ -488,7 +489,7 @@ export default class CustomBadge {
               items: checkListSelectItems,
               title: "Select a Checklist",
             }
-            tt.popup(opts);
+            TrelloFrame.openPopup(tt, opts);
           },
         });        
       }
@@ -507,7 +508,7 @@ export default class CustomBadge {
       url: Common.detailsPage,
       height: 265,
     };
-    return t.modal(popupOpts);
+    return TrelloFrame.openModal(t, popupOpts);
   }
   /** 
    * Returns the Badge Settings as a JSON string

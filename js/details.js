@@ -2,6 +2,7 @@
 /* global TrelloBoardRegistration */
 /// <reference path="../types/registered.d.js" />
 /// <reference path="../types/trello.d.js" />
+import TrelloFrame from "./common/trelloFrame";
 import Common from "./common/common";
 import BoardChart from "./ui/pages/boardChart";
 import CustomValuePage from "./ui/pages/customValuePage";
@@ -25,15 +26,15 @@ var t = tpu.iframe({
  */
 t.render(async () => {
   /** @type {"settings" | "stats" | "disabled" | "chart" | "custom" | "tour"} */
-  const viewType = await t.arg("view");
+  const viewType = await TrelloFrame.getArg("view");
   switch (viewType) {
     case "tour":
-      const show = await t.arg("show");
+      const show = await TrelloFrame.getArg("show");
       const tour = new Tour(document.getElementById("content"));
       tour.render(t, show);
       break;
     case "custom":
-      const override = await t.arg("override");
+      const override = await TrelloFrame.getArg("override");
       const cv = new CustomValuePage();
       await cv.render(t, override);
       break;
@@ -43,7 +44,7 @@ t.render(async () => {
       break;
     case "stats":
       /** @type {"board" | "list"} */
-      const statsType = await t.arg("stats");
+      const statsType = await TrelloFrame.getArg("stats");
       const s = new StatsPage();
       s.render(t, statsType);
       break;
@@ -54,23 +55,6 @@ t.render(async () => {
     case "welcome":
       const w = new WelcomePage();
       w.render(t);
-      break;
-    case "disabled":
-      try {
-        await Common.tbr.init({
-          appName: Common.APPNAME,
-          appVersion: Common.VERSION,
-          isBeta: Common.isBeta,
-          boardData: {
-            boardName: "UNKNOWN",
-            idBoard: "UNKNOWN",
-            idMember: "UNKNOWN",
-            members: -1,
-            idOrg: "UNKNOWN",
-          },
-        });
-        await Common.tbr.showDisabledForm(t);
-      } catch { }
       break;
   }
 });

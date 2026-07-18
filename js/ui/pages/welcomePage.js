@@ -1,3 +1,4 @@
+import TrelloFrame from "../../common/trelloFrame";
 import TrelloTokenWrapper from "../../api/trelloTokenWrapper";
 import Common from "../../common/common";
 import BasePage from "./_basePage";
@@ -78,7 +79,7 @@ export default class WelcomePage extends BasePage {
         height: 265,
         mouseEvent: e,
       };
-      return t.modal(popupOpts);
+      return TrelloFrame.openModal(t, popupOpts);
     });
     document.getElementById("settingsButton").addEventListener("click", (e)=> {
       /** @type {TrelloPopupIFrameOptions} */
@@ -89,7 +90,7 @@ export default class WelcomePage extends BasePage {
         height: 265,
         mouseEvent: e,
       };
-      return t.popup(popupOpts);
+      return TrelloFrame.openPopup(t, popupOpts);
     });
     window.setTimeout(()=>t.sizeTo("#content"), 100);
   }

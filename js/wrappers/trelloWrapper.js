@@ -2,6 +2,7 @@
 /* global TrelloBoardRegistration */
 /// <reference path="../../types/registered.d.js" />
 /// <reference path="../../types/trello.d.js" />
+import TrelloFrame from "../common/trelloFrame";
 import TrelloTokenWrapper from "../api/trelloTokenWrapper";
 import Common from "../common/common";
 import { CommonLogger } from "../common/commonLogger";
@@ -67,7 +68,7 @@ export default class TrelloWrapper extends BasePage {
           text: "⚙️ Settings...",
           callback: (ttt) => this.#showSettings(ttt),
         });
-        tt.popup(boardMenuPopup);
+        TrelloFrame.openPopup(tt, boardMenuPopup);
       }
     }];
     CommonLogger.log(`(getBoardButton) Completed.`);
@@ -86,7 +87,7 @@ export default class TrelloWrapper extends BasePage {
       url: Common.detailsPage,
       height: 265,
     };
-    return t.modal(popupOpts);    
+    return TrelloFrame.openModal(t, popupOpts);    
   }
   /**
    * Returns the front card badge
@@ -143,16 +144,8 @@ export default class TrelloWrapper extends BasePage {
    * Shows the disable form to the user
    * @param {TrelloObject} t 
    */
-  onDisable = async(t) => {
-    /** @type {TrelloModalOptions} */
-    const modalDlg = {
-      fullscreen: false,
-      height: 495,
-      url: Common.detailsPage,
-      args: { view: "disabled" },
-      title: `Disabling ${Common.APPNAME}`,
-    };
-    t.modal(modalDlg);
+  onDisable = (t) => {
+    Common.tbr.showDisabledFeedback();
   }
   /**
    * Returns if the user is authenticated
@@ -175,14 +168,14 @@ export default class TrelloWrapper extends BasePage {
       args: { view: "welcome" },
       title: `Thank you for Installing ${Common.APPNAME}`,
     };
-    t.modal(modalDlg);
+    TrelloFrame.openModal(t, modalDlg);
   }
   /**
    * Shows the board stats to the user
    * @param {TrelloObject} t 
    */
   #showBoardStats = async (t) => {
-    t.popup({
+    TrelloFrame.openPopup(t, {
       args: {view: "stats", stats: "board"},
       title: "Board Completeness Stats",
       url: Common.detailsPage,
@@ -193,7 +186,7 @@ export default class TrelloWrapper extends BasePage {
    * @param {TrelloObject} t 
    */
   #showBoardChart = async (t) => {
-    t.modal({
+    TrelloFrame.openModal(t, {
       fullscreen: false,
       args: {view: "chart"},
       title: "Board Completeness Chart",
@@ -212,6 +205,6 @@ export default class TrelloWrapper extends BasePage {
       url: Common.detailsPage,
       height: 265,
     };
-    return t.modal(popupOpts);
+    return TrelloFrame.openModal(t, popupOpts);
   }
 }

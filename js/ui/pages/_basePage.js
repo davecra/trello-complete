@@ -1,3 +1,4 @@
+import TrelloFrame from "../../common/trelloFrame";
 import Common from "../../common/common";
 import { CommonLogger } from "../../common/commonLogger";
 import SettingsWrapper from "../../common/settingsWrapper";
@@ -96,7 +97,7 @@ export default class BasePage {
       /** @type {TrelloMemberObject} */
       const member = await t.member("id");
       // wait here until init is completed
-      await new Promise(async (resolve) => await Common.tbr.init({
+      await new Promise(async (resolve) => await Common.initTbr({
         appName: Common.APPNAME,
         appVersion: Common.VERSION,
         isBeta: Common.isBeta || Common.isDebug,

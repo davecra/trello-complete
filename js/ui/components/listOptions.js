@@ -2,6 +2,7 @@
 /* global TrelloBoardRegistration */
 /// <reference path="../../../types/registered.d.js" />
 /// <reference path="../../../types/trello.d.js" />
+import TrelloFrame from "../../common/trelloFrame";
 import Common from "../../common/common";
 import CustomBadge from "./customBadge";
 import SettingsWrapper from "../../common/settingsWrapper";
@@ -96,7 +97,7 @@ export default class ListOptions {
     {
       text: "📊 Get Stats...",
       callback: /** @param {TrelloObject} tt */ async (tt) => {
-        tt.popup({
+        TrelloFrame.openPopup(tt, {
           args: {view: "stats", stats: "list"},
           title: "List Completeness Stats",
           url: Common.detailsPage,
@@ -106,7 +107,7 @@ export default class ListOptions {
       text: "🖌️ Enable badge on all cards in list...",
       callback: async (tt)=> {
         if(Common.tbr.checkFeatureWithNotification(t, true, "alert", "bulk list action") === true) {
-          tt.popup(this.#getListEnableDisableAction(tt, true));
+          TrelloFrame.openPopup(tt, this.#getListEnableDisableAction(tt, true));
         } else {
           tt.closePopup();
         }
@@ -115,7 +116,7 @@ export default class ListOptions {
       text: "🖌️ Disable badge on all cards in list...",
       callback: async (tt)=> {
         if(Common.tbr.checkFeatureWithNotification(t, true, "alert", "bulk list action") === true) {
-          tt.popup(this.#getListEnableDisableAction(tt, false));
+          TrelloFrame.openPopup(tt, this.#getListEnableDisableAction(tt, false));
         } else {
           tt.closePopup();
         }
@@ -135,7 +136,7 @@ export default class ListOptions {
                 title: `${Common.APPNAME} List Actions`,
                 items: subMenu,
             };
-            tt.popup(mnuAging);
+            TrelloFrame.openPopup(tt, mnuAging);
         },
     }];
     // return

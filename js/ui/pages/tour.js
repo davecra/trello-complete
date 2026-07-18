@@ -1,8 +1,10 @@
+import TrelloFrame from "../../common/trelloFrame";
 import Common from "../../common/common";
 import SettingsWrapper from "../../common/settingsWrapper";
 import Styles from "../../common/styles";
+import BasePage from "./_basePage";
 
-export default class Tour {
+export default class Tour extends BasePage {
   /** @type {HTMLDivElement} */
   #content = null;
   /** @type {Number} */
@@ -15,9 +17,9 @@ export default class Tour {
    * CTOR
    */
   constructor(content) {
+    super();
     this.#content = content;
     this.#applyStyles();
-    this.#pages = this.#loadPages();
   }
   /**
    * Renders the tour
@@ -25,6 +27,10 @@ export default class Tour {
    * @param {Boolean} [showWelcome]
    */
   render = async (t, showWelcome = false) => {
+    if (this.#pages.length === 0) {
+      await this._init(t, "tour");
+      this.#pages = this.#loadPages();
+    }
     Styles.applyCss(document.getElementById("content"));
     const html = /*html*/`
       <div id="headerDiv">
@@ -253,7 +259,7 @@ export default class Tour {
         args: { view: "welcome" },
         title: `Thank you for Installing ${Common.APPNAME}`,
       };
-      t.modal(modalDlg);
+      TrelloFrame.openModal(t, modalDlg);
     };
 
     const saveTourState = async (t) => {
