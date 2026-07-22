@@ -74,6 +74,7 @@ export default class ListOptions {
       });
       /** @type {String[]} */
       const result = sortedCards.map(function (c) { return c.id; });
+      Common.sqid("fulluse1");
       // return
       return { sortedIds: result };
     } else {
@@ -164,6 +165,7 @@ export default class ListOptions {
         for (const c of list.cards) {
           await t.set(c.id, s.mode, CustomBadge._CARD_BADGE_ENABLED_PROP, enabled);
         }
+        Common.sqid("fulluse1");
       },
       title: Common.APPNAME  + " List Action",
       type: "confirm",

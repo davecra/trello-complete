@@ -29,6 +29,22 @@ export default class Common {
     }
     await window.FROM_TBR_SCRIPT_TAG.__tbr.init(cdata);
   };
+  /**
+   * Safely records a software quality identifier.
+   * @param {String} id
+   * @param {Number} [amount]
+   */
+  static sqid = (id, amount = -1) => {
+    try {
+      if (Common.tbr && Common.tbr.sqid && typeof Common.tbr.sqid === "function") {
+        Common.tbr.sqid(id, amount);
+      } else {
+        console.error("FAILED: SQID (no tbr): " + id + (amount !== -1 ? " (" + amount + ")" : ""));
+      }
+    } catch (ex) {
+      console.error("FAILED: SQID (exception): " + id + (amount !== -1 ? " (" + amount + ")" : "") + " - " + ex.message);
+    }
+  };
   ///////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////SUBSCRIPTION REGISTRATION///////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////

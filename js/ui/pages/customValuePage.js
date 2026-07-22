@@ -31,6 +31,7 @@ export default class CustomValuePage extends BasePage {
       await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_COMPLETENESS_PROP, v);
       await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_CHECKLIST_PROP, null);
       if (override) await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_OVERRIDE_PROP, true);
+      Common.sqid("fulluse1");
       t.closePopup();
     });
     document.getElementById("cancelButton").addEventListener("click", () => {

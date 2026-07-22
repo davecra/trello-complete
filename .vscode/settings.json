@@ -4,10 +4,12 @@
       "APPNAME",
       "beforechange",
       "colspan",
+      "fulluse",
       "ITSM",
       "Kryl",
       "lightgray",
       "PRIORITYBADGE",
+      "sqid",
       "taskpane"
     ]
 }

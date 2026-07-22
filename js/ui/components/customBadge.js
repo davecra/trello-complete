@@ -263,6 +263,7 @@ export default class CustomBadge {
               callback: async (tt) => {
                 this.#cardSettings.enabled = !this.#cardSettings.enabled;
                 await this.#saveBadgeSettings(tt);
+                Common.sqid("fulluse1");
                 tt.closePopup();
               }
             });
@@ -272,6 +273,7 @@ export default class CustomBadge {
                 callback: async (tt) => {
                   this.#cardSettings.override = false;
                   await this.#saveBadgeSettings(tt);
+                  Common.sqid("fulluse1");
                   tt.closePopup();
                 }
               });              
@@ -369,6 +371,7 @@ export default class CustomBadge {
     this.#cardSettings.checklistId = null;
     this.#cardSettings.override = override;
     await this.#saveBadgeSettings(t);
+    Common.sqid("fulluse1");
   };
   /**
    * Prompts the user to override the board setting
@@ -426,6 +429,7 @@ export default class CustomBadge {
       this.#cardSettings.override = override;
     }
     await this.#saveBadgeSettings(t);
+    Common.sqid("fulluse1");
     t.closePopup();
   }
   /**

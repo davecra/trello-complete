@@ -581,6 +581,7 @@ export default class SettingsPage extends BasePage {
     // save
     this.#saveButton.disabled = true;
     await this._settings.save(t);
+    Common.sqid("fulluse1");
     this.#hidePremiumFeatureSettings();
   }
   /**

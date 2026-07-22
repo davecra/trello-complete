@@ -41,6 +41,7 @@ export default class StatsPage extends BasePage{
       }, true);
       return;
     }
+    Common.sqid("fulluse1");
   };
   /**
    * Determines if a card should be included in the report

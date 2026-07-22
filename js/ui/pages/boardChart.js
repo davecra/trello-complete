@@ -63,6 +63,7 @@ export default class BoardChart extends BasePage {
     }
     listSelect.addEventListener("change", async ()=> {
       await this.#renderChart(t, listSelect.selectedOptions[0].text);
+      Common.sqid("fulluse1");
       t.sizeTo("#content");
     });
     await this.#renderChart(t);
@@ -78,6 +79,7 @@ export default class BoardChart extends BasePage {
       });
       return;
     }
+    Common.sqid("fulluse1");
   }
   /**
    * Renders the chart
