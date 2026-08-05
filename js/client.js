@@ -12,7 +12,7 @@ import TrelloWrapper from './wrappers/trelloWrapper';
   const tpu = window.TrelloPowerUp;
   tpu.initialize({
     "show-authorization": async (t) => await w.onEnable(t),
-    "authorization-status": async (t, opts) => { authorized: await w.isAuthOk(t)},
+    "authorization-status": async (t) => ({ authorized: await w.isAuthOk(t) }),
     "board-buttons": async (t) => await w.getBoardButton(t),
     "card-badges": async (t) => await w.getCardBadge(t),
     "card-detail-badges": async (t) => await w.getCardDetailBadge(t),

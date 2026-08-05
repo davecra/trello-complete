@@ -25,10 +25,6 @@ export default class TrelloWrapper extends BasePage {
     await s.load(t, true);
     CommonLogger.enabled = s.enableLogging;
     CommonLogger.log(`(getBoardButton) Loading Board button.`);
-    if (!(await TrelloTokenWrapper.getToken(t, true))) {
-      CommonLogger.log(`(getBoardButton) Need token form user.`);
-      await this.onEnable(t);
-    }
     /** @type {TrelloBoardButtonOption[]} */
     const boardButtons = [{
       text: Common.TITLE,
@@ -36,7 +32,7 @@ export default class TrelloWrapper extends BasePage {
       icon: Common.ICON_DARK,
       callback: async (tt) => {
         if (!(await TrelloTokenWrapper.getToken(tt, true))) {
-          await this.onEnable(t);
+          await this.onEnable(tt);
           return;
         }
         CommonLogger.log("(getBoardButton) Loading board button.");
@@ -152,7 +148,6 @@ export default class TrelloWrapper extends BasePage {
    */
   isAuthOk = async (t) => {
     const trelloToken = await TrelloTokenWrapper.getToken(t, true);
-    if (!trelloToken) await this.onEnable(t);
     return trelloToken ? true : false;
   }
   /**
