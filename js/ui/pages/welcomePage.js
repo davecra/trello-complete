@@ -19,13 +19,13 @@ export default class WelcomePage extends BasePage {
         <h2>🎉 Thank you for installing ${Common.APPNAME}</h2>
         <p>We at Kryl Solutions, LLC appreciate having you on board.</p>
         <div id="div1">
-          <p>To get started, you will need to authorize this Power-Up for use with the <b>Trello API</b>:</p>
+          <p>Authorization is optional for the basic badge. You only need to authorize this Power-Up if you plan to use checklist tracking or another feature that needs <b>Trello API</b> access:</p>
           <p><button type="button" class="welcomeButtonStyle" id="authButton">🔐 Authorize Trello...</button></p>
           <p><b>Note</b>: Some browsers might block the Authentication prompt.</p>
           <p><img title="blocked popup" width="180px" src="./images/blocked.png" /></p>
           <br />
-          <p>Once you completed authorization, click Next:</p>
-          <button type="button" id="nextButton" disabled>Next ></button>
+          <p>Authorize now, or click Next and authorize later when you use a feature that needs it:</p>
+          <button type="button" id="nextButton">Next ></button>
           <hr />
           <p>version ${Common.VERSION}</p>
         </div>
@@ -52,14 +52,13 @@ export default class WelcomePage extends BasePage {
       t.closeModal();
     });
     const authButton = document.getElementById('authButton');
+    const nextButton = document.getElementById("nextButton");
     authButton.addEventListener('click', async () => { 
       const token = await TrelloTokenWrapper.getToken(t, false); 
       if (token) {
-        nextButton.disabled = false;
         authButton.disabled = true;
       }
     });
-    const nextButton = document.getElementById("nextButton");
     nextButton.addEventListener("click", () => {
       document.getElementById("div1").hidden = true;
       document.getElementById("div2").hidden = false;

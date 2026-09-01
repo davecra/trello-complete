@@ -25,14 +25,28 @@ export default class CustomValuePage extends BasePage {
       </div>
     `;
     document.getElementById("content").innerHTML = html;
-    document.getElementById("okButton").addEventListener("click", async () => {
+    const okButton = document.getElementById("okButton");
+    okButton.addEventListener("click", async () => {
       const v = document.getElementById("customValueInput").value;
-      await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_ENABLED_PROP, true);
-      await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_COMPLETENESS_PROP, v);
-      await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_CHECKLIST_PROP, null);
-      if (override) await t.set(card.id, this._settings.mode, CustomBadge._CARD_BADGE_OVERRIDE_PROP, true);
-      Common.sqid("fulluse1");
-      t.closePopup();
+      okButton.disabled = true;
+      try {
+        const values = {
+          [CustomBadge._CARD_BADGE_ENABLED_PROP]: true,
+          [CustomBadge._CARD_BADGE_COMPLETENESS_PROP]: v,
+          [CustomBadge._CARD_BADGE_CHECKLIST_PROP]: null,
+        };
+        if (override) values[CustomBadge._CARD_BADGE_OVERRIDE_PROP] = true;
+        await t.set(card.id, this._settings.mode, values);
+        Common.sqid("fulluse1");
+        t.closePopup();
+      } catch (error) {
+        console.error("Unable to save custom badge value.", error);
+        okButton.disabled = false;
+        t.alert({
+          message: "⚠️ Unable to save the badge value. Please try again.",
+          duration: 6,
+        });
+      }
     });
     document.getElementById("cancelButton").addEventListener("click", () => {
       t.closePopup();
